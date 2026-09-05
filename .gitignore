@@ -9,6 +9,7 @@
 .history
 .svn/
 migrate_working_dir/
+devtools_options.yaml
 
 # IntelliJ related
 *.iml
@@ -30,7 +31,6 @@ migrate_working_dir/
 /build/
 
 # Web related
-lib/generated_plugin_registrant.dart
 
 # Symbol processing related
 undecorated_symbol_map.yaml
