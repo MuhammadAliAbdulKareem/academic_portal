@@ -1,0 +1,36 @@
+name: academic_portal
+description: "Modern Academic Portal for higher education course & learning management."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+  # State Management
+  flutter_bloc: ^9.1.1
+  bloc: ^9.0.0
+  equatable: ^2.0.7
+
+  # Navigation & Routing
+  go_router: ^16.2.0
+
+  # Typography & Design System
+  google_fonts: ^6.2.1
+
+  # Firebase Foundation
+  firebase_core: ^3.12.1
+  firebase_auth: ^5.5.1
+  cloud_firestore: ^5.6.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
