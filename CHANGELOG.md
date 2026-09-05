@@ -4,6 +4,41 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.7.0] - 2026-09-05 — Assignment Submission & Grading System
+
+### Added
+- Domain Layer:
+  - `AssignmentEntity`, `AssignmentRubricItem`, `RubricLevel`, `SubmissionEntity`, `RubricScore`, `GradebookEntry`, and `CourseGradebook`.
+  - `AssignmentRepository` contract covering course assignment retrieval, student submission management, rubric grading, and gradebook calculation.
+- Data Layer:
+  - `AssignmentModel`, `AssignmentRubricItemModel`, `RubricLevelModel`, `SubmissionModel`, and `RubricScoreModel` with Firestore / JSON serialization and deserialization.
+  - `AssignmentRemoteDataSource` and `AssignmentRemoteDataSourceImpl` with pre-seeded assignments (CS101, CS201, MATH301), multi-level rubrics, diverse submissions (graded, needs grading, pending), and gradebook aggregates.
+  - `AssignmentRepositoryImpl` with robust error handling and domain entity mapping.
+- State Management:
+  - `AssignmentListCubit` & `AssignmentListState` supporting real-time search, course code filtering, status tabs, and assignment creation.
+  - `AssignmentDetailCubit` & `AssignmentDetailState` coordinating assignment details and student submissions.
+  - `SubmissionCubit` & `SubmissionState` handling file upload simulation, text responses, and submission validation.
+  - `GradingCubit` & `GradingState` driving instructor rubric matrix scoring, constructive feedback, and publishing.
+  - `GradebookCubit` & `GradebookState` calculating class averages, high/low scores, and weighted letter grade rosters.
+- Presentation Components & Screens:
+  - `AssignmentCard`: Adaptive card with course badge, weight pill, relative deadline countdown, and contextual action buttons.
+  - `SubmissionItemCard`: Submissions queue card with student avatar, attachment details, and grading launcher.
+  - `RubricScoringWidget`: Interactive multi-tier rubric evaluation and review widget.
+  - `GradeSummaryCard`: Visual evaluation summary featuring letter grade badge, progress bar, and instructor comments.
+  - `AssignmentListScreen`: Dual-role assignments command center featuring search, course filters, status tabs, and assignment creation modal.
+  - `AssignmentDetailScreen`: Deep overview with instructions, attachments, rubric review, and student submission portal.
+  - `AssignmentGradingScreen`: Instructor grading cockpit with student switcher, deliverable previews, rubric matrix, and publish controls.
+  - `CourseGradebookScreen`: Course gradebook matrix with class average KPIs, student roster table, and CSV export.
+- Cross-Feature Routing & Shell Integration:
+  - Added routes `RouteConstants.assignments`, `RouteConstants.assignmentDetail`, `RouteConstants.assignmentGrading`, and `RouteConstants.gradebook`.
+  - Added `Assignments` tab to `PortalNavigationShell.defaultNavItems`.
+  - Integrated `AssignmentRepository` and all 5 cubits into `AcademicPortalApp` root providers.
+  - Linked student dashboard deadlines and instructor grading queue directly to assignment screens.
+- Quality Assurance:
+  - Comprehensive unit and widget tests in `test/assignments_test.dart` (44 total project tests passing cleanly across the entire suite).
+  - 0 static analysis issues on `flutter analyze`.
+  - Production web compilation verified with `flutter build web --release`.
+
 ## [v0.6.0] - 2026-09-05 — Student Portal & Course Enrollment
 
 ### Added
