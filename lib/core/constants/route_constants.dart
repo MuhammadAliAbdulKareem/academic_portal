@@ -10,5 +10,7 @@ class RouteConstants {
   static const String dashboard = '/dashboard';
   static const String instructorDashboard = '/instructor-dashboard';
   static const String courses = '/courses';
+  static const String courseCreate = '/courses/create';
+  static const String courseDetail = '/courses/:id';
   static const String notFound = '/404';
 }
