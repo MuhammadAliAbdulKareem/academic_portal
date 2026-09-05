@@ -376,6 +376,7 @@ class _CourseCreateScreenState extends State<CourseCreateScreen> {
                     const SizedBox(height: 6),
                     DropdownButtonFormField<String>(
                       initialValue: _selectedDepartment,
+                      isExpanded: true,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         contentPadding: EdgeInsets.symmetric(
@@ -403,6 +404,7 @@ class _CourseCreateScreenState extends State<CourseCreateScreen> {
                     const SizedBox(height: 6),
                     DropdownButtonFormField<String>(
                       initialValue: _selectedTerm,
+                      isExpanded: true,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         contentPadding: EdgeInsets.symmetric(
@@ -518,16 +520,20 @@ class _CourseCreateScreenState extends State<CourseCreateScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.xs,
             children: [
               Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   const Icon(Icons.menu_book_rounded,
                       size: 20, color: AppColors.accentTeal),
                   const SizedBox(width: AppSpacing.sm),
                   Text(
-                    'Syllabus & Learning Modules (${_syllabus.length})',
+                    'Syllabus & Modules (${_syllabus.length})',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),

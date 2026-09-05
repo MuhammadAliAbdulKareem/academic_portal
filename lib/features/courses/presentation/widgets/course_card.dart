@@ -217,7 +217,7 @@ class CourseCard extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: PortalButton(
-                  label: 'View Course Details',
+                  label: 'View Details',
                   variant: PortalButtonVariant.outline,
                   size: PortalButtonSize.sm,
                   onPressed: onTap,
