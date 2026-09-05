@@ -4,6 +4,7 @@ class RouteConstants {
 
   static const String root = '/';
   static const String foundation = '/foundation';
+  static const String designSystem = '/design-system';
   static const String login = '/login';
   static const String register = '/register';
   static const String dashboard = '/dashboard';

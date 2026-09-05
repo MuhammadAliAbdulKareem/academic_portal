@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/bloc/theme_cubit.dart';
 import '../../../../core/bloc/theme_state.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/constants/route_constants.dart';
 import '../../../../core/firebase/firebase_config.dart';
 import '../../../../core/responsive/responsive_builder.dart';
 import '../../../../core/responsive/responsive_extensions.dart';
@@ -176,6 +178,17 @@ class FoundationScreen extends StatelessWidget {
             style: theme.textTheme.bodyLarge?.copyWith(
               color: Colors.white.withValues(alpha: 0.9),
             ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: isDark ? AppColors.darkBackground : AppColors.primary,
+              elevation: 0,
+            ),
+            onPressed: () => context.go(RouteConstants.designSystem),
+            icon: const Icon(Icons.palette_rounded, size: 18),
+            label: const Text('Explore Design System (v0.2.0)'),
           ),
         ],
       ),
