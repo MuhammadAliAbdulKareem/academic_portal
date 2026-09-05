@@ -11,6 +11,7 @@ class MetricCard extends StatelessWidget {
   final Color color;
   final String? subtitle;
   final String? trendBadge;
+  final VoidCallback? onTap;
 
   const MetricCard({
     super.key,
@@ -20,6 +21,7 @@ class MetricCard extends StatelessWidget {
     required this.color,
     this.subtitle,
     this.trendBadge,
+    this.onTap,
   });
 
   @override
@@ -28,6 +30,7 @@ class MetricCard extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     return PortalCard(
+      onTap: onTap,
       isHoverable: true,
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Column(

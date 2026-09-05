@@ -77,6 +77,12 @@ class PortalNavigationShell extends StatefulWidget {
       selectedIcon: Icons.assignment_rounded,
       route: '/assignments',
     ),
+    PortalNavItem(
+      label: 'Attendance',
+      icon: Icons.qr_code_scanner_outlined,
+      selectedIcon: Icons.qr_code_scanner_rounded,
+      route: '/attendance',
+    ),
   ];
 
   @override

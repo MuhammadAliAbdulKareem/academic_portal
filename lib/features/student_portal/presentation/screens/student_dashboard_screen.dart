@@ -308,6 +308,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
             icon: Icons.assignment_outlined,
             color: AppColors.warning,
             subtitle: 'Keep up the great pace!',
+            onTap: () => context.go(RouteConstants.assignments),
           ),
           MetricCard(
             title: 'Attendance Standing',
@@ -316,6 +317,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
             color: AppColors.accentTeal,
             trendBadge: 'Excellent',
             subtitle: 'Top 5% in department',
+            onTap: () => context.go(RouteConstants.attendance),
           ),
         ];
 

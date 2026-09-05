@@ -17,6 +17,8 @@ import '../../features/assignments/presentation/screens/assignment_list_screen.d
 import '../../features/assignments/presentation/screens/assignment_detail_screen.dart';
 import '../../features/assignments/presentation/screens/assignment_grading_screen.dart';
 import '../../features/assignments/presentation/screens/course_gradebook_screen.dart';
+import '../../features/attendance/presentation/screens/attendance_screen.dart';
+import '../../features/attendance/presentation/screens/session_detail_screen.dart';
 
 /// Helper to bridge Stream changes to GoRouter's Listenable refresh.
 class GoRouterRefreshStream extends ChangeNotifier {
@@ -160,6 +162,19 @@ class AppRouter {
           builder: (context, state) {
             final courseId = state.pathParameters['id'] ?? '';
             return CourseGradebookScreen(courseId: courseId);
+          },
+        ),
+        GoRoute(
+          path: RouteConstants.attendance,
+          name: 'attendance',
+          builder: (context, state) => const AttendanceScreen(),
+        ),
+        GoRoute(
+          path: RouteConstants.attendanceSessionDetail,
+          name: 'attendance-session-detail',
+          builder: (context, state) {
+            final sessionId = state.pathParameters['id'] ?? '';
+            return SessionDetailScreen(sessionId: sessionId);
           },
         ),
       ],

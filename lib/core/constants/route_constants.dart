@@ -17,5 +17,7 @@ class RouteConstants {
   static const String assignmentDetail = '/assignments/:id';
   static const String assignmentGrading = '/assignments/:id/grade';
   static const String gradebook = '/courses/:id/gradebook';
+  static const String attendance = '/attendance';
+  static const String attendanceSessionDetail = '/attendance/session/:id';
   static const String notFound = '/404';
 }

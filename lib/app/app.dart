@@ -35,6 +35,13 @@ import '../features/assignments/presentation/cubit/assignment_list_cubit.dart';
 import '../features/assignments/presentation/cubit/gradebook_cubit.dart';
 import '../features/assignments/presentation/cubit/grading_cubit.dart';
 import '../features/assignments/presentation/cubit/submission_cubit.dart';
+import '../features/attendance/data/datasources/attendance_remote_data_source.dart';
+import '../features/attendance/data/repositories/attendance_repository_impl.dart';
+import '../features/attendance/domain/repositories/attendance_repository.dart';
+import '../features/attendance/presentation/cubit/attendance_roster_cubit.dart';
+import '../features/attendance/presentation/cubit/attendance_session_cubit.dart';
+import '../features/attendance/presentation/cubit/student_attendance_history_cubit.dart';
+import '../features/attendance/presentation/cubit/student_check_in_cubit.dart';
 
 /// Root application widget configuring global providers, router, and reactive theming.
 class AcademicPortalApp extends StatefulWidget {
@@ -43,6 +50,7 @@ class AcademicPortalApp extends StatefulWidget {
   final InstructorDashboardRepository? instructorDashboardRepository;
   final EnrollmentRepository? enrollmentRepository;
   final AssignmentRepository? assignmentRepository;
+  final AttendanceRepository? attendanceRepository;
 
   const AcademicPortalApp({
     super.key,
@@ -51,6 +59,7 @@ class AcademicPortalApp extends StatefulWidget {
     this.instructorDashboardRepository,
     this.enrollmentRepository,
     this.assignmentRepository,
+    this.attendanceRepository,
   });
 
   @override
@@ -75,6 +84,11 @@ class _AcademicPortalAppState extends State<AcademicPortalApp> {
   late final SubmissionCubit _submissionCubit;
   late final GradingCubit _gradingCubit;
   late final GradebookCubit _gradebookCubit;
+  late final AttendanceRepository _attendanceRepository;
+  late final AttendanceSessionCubit _attendanceSessionCubit;
+  late final AttendanceRosterCubit _attendanceRosterCubit;
+  late final StudentCheckInCubit _studentCheckInCubit;
+  late final StudentAttendanceHistoryCubit _studentAttendanceHistoryCubit;
   late final GoRouter _router;
 
   @override
@@ -114,6 +128,12 @@ class _AcademicPortalAppState extends State<AcademicPortalApp> {
               AssignmentRemoteDataSourceImpl(firestore: firestore),
         );
 
+    _attendanceRepository = widget.attendanceRepository ??
+        AttendanceRepositoryImpl(
+          remoteDataSource:
+              AttendanceRemoteDataSourceImpl(firestore: firestore),
+        );
+
     _authCubit = AuthCubit(authRepository: _authRepository);
     _themeCubit = ThemeCubit();
     _coursesCubit = CoursesCubit(repository: _courseRepository);
@@ -128,6 +148,11 @@ class _AcademicPortalAppState extends State<AcademicPortalApp> {
     _submissionCubit = SubmissionCubit(repository: _assignmentRepository);
     _gradingCubit = GradingCubit(repository: _assignmentRepository);
     _gradebookCubit = GradebookCubit(repository: _assignmentRepository);
+    _attendanceSessionCubit = AttendanceSessionCubit(repository: _attendanceRepository);
+    _attendanceRosterCubit = AttendanceRosterCubit(repository: _attendanceRepository);
+    _studentCheckInCubit = StudentCheckInCubit(repository: _attendanceRepository);
+    _studentAttendanceHistoryCubit =
+        StudentAttendanceHistoryCubit(repository: _attendanceRepository);
 
     _router = AppRouter.createRouter(_authCubit);
   }
@@ -146,6 +171,10 @@ class _AcademicPortalAppState extends State<AcademicPortalApp> {
     _submissionCubit.close();
     _gradingCubit.close();
     _gradebookCubit.close();
+    _attendanceSessionCubit.close();
+    _attendanceRosterCubit.close();
+    _studentCheckInCubit.close();
+    _studentAttendanceHistoryCubit.close();
     super.dispose();
   }
 
@@ -154,6 +183,7 @@ class _AcademicPortalAppState extends State<AcademicPortalApp> {
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider<AssignmentRepository>.value(value: _assignmentRepository),
+        RepositoryProvider<AttendanceRepository>.value(value: _attendanceRepository),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -170,6 +200,11 @@ class _AcademicPortalAppState extends State<AcademicPortalApp> {
           BlocProvider<SubmissionCubit>.value(value: _submissionCubit),
           BlocProvider<GradingCubit>.value(value: _gradingCubit),
           BlocProvider<GradebookCubit>.value(value: _gradebookCubit),
+          BlocProvider<AttendanceSessionCubit>.value(value: _attendanceSessionCubit),
+          BlocProvider<AttendanceRosterCubit>.value(value: _attendanceRosterCubit),
+          BlocProvider<StudentCheckInCubit>.value(value: _studentCheckInCubit),
+          BlocProvider<StudentAttendanceHistoryCubit>.value(
+              value: _studentAttendanceHistoryCubit),
         ],
         child: BlocBuilder<ThemeCubit, ThemeState>(
           builder: (context, themeState) {
