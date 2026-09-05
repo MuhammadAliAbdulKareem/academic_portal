@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.4.0] - 2026-09-05 — Instructor Dashboard
+
+### Added
+- Domain entities: `InstructorDashboardStats`, `CourseSummaryEntity`, `RecentActivityEntity`, and `UpcomingDeadlineEntity`.
+- Repository layer: `InstructorDashboardRepository` and `InstructorDashboardRepositoryImpl` backed by `InstructorDashboardRemoteDataSource` with Firestore integration and offline mock fallbacks.
+- State Management: `InstructorDashboardCubit` and `InstructorDashboardState` (`Initial`, `Loading`, `Loaded`, `Error`) with parallel async loading and pull-to-refresh support.
+- KPI & Course Components:
+  - `MetricCard`: KPI component with icon badge, numerical counters, subtitle, and trend pill indicators.
+  - `CourseOverviewCard`: Card displaying course code, enrolled student tally, course title, schedule, room, department, and manage actions.
+- Instructor Command Center:
+  - `InstructorDashboardScreen`: Responsive command center featuring greeting header banner, quick course creation action, 4 KPI metric cards, assigned course grid, live student activity feed, and grading queue deadline breakdown.
+- Navigation Shell & Routing Integration:
+  - Route constants `RouteConstants.dashboard` and `RouteConstants.instructorDashboard` (`/instructor-dashboard`).
+  - GoRouter routing connected to `InstructorDashboardScreen`.
+  - `PortalNavigationShell` updated with `Dashboard` destination tab and automatic route resolution.
+  - Quick-launch navigation added to `FoundationScreen` hero banner.
+- Quality Assurance:
+  - Unit and widget test suite in `test/instructor_dashboard_test.dart` (19 total project tests passing cleanly).
+  - Production web bundle compiled (`flutter build web --release`).
+
 ## [v0.3.0] - 2026-09-05 — Authentication
 
 ### Added
