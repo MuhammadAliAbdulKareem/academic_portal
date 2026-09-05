@@ -71,6 +71,12 @@ class PortalNavigationShell extends StatefulWidget {
       selectedIcon: Icons.menu_book_rounded,
       route: '/courses',
     ),
+    PortalNavItem(
+      label: 'Assignments',
+      icon: Icons.assignment_outlined,
+      selectedIcon: Icons.assignment_rounded,
+      route: '/assignments',
+    ),
   ];
 
   @override

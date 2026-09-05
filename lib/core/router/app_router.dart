@@ -13,6 +13,10 @@ import '../../features/courses/presentation/screens/course_create_screen.dart';
 import '../../features/courses/presentation/screens/course_detail_screen.dart';
 import '../../features/courses/presentation/screens/course_list_screen.dart';
 import '../../features/student_portal/presentation/screens/student_dashboard_screen.dart';
+import '../../features/assignments/presentation/screens/assignment_list_screen.dart';
+import '../../features/assignments/presentation/screens/assignment_detail_screen.dart';
+import '../../features/assignments/presentation/screens/assignment_grading_screen.dart';
+import '../../features/assignments/presentation/screens/course_gradebook_screen.dart';
 
 /// Helper to bridge Stream changes to GoRouter's Listenable refresh.
 class GoRouterRefreshStream extends ChangeNotifier {
@@ -127,6 +131,35 @@ class AppRouter {
           builder: (context, state) {
             final courseId = state.pathParameters['id'] ?? '';
             return CourseDetailScreen(courseId: courseId);
+          },
+        ),
+        GoRoute(
+          path: RouteConstants.assignments,
+          name: 'assignments',
+          builder: (context, state) => const AssignmentListScreen(),
+        ),
+        GoRoute(
+          path: RouteConstants.assignmentDetail,
+          name: 'assignment-detail',
+          builder: (context, state) {
+            final assignmentId = state.pathParameters['id'] ?? '';
+            return AssignmentDetailScreen(assignmentId: assignmentId);
+          },
+        ),
+        GoRoute(
+          path: RouteConstants.assignmentGrading,
+          name: 'assignment-grading',
+          builder: (context, state) {
+            final assignmentId = state.pathParameters['id'] ?? '';
+            return AssignmentGradingScreen(assignmentId: assignmentId);
+          },
+        ),
+        GoRoute(
+          path: RouteConstants.gradebook,
+          name: 'course-gradebook',
+          builder: (context, state) {
+            final courseId = state.pathParameters['id'] ?? '';
+            return CourseGradebookScreen(courseId: courseId);
           },
         ),
       ],

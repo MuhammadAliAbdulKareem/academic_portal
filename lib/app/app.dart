@@ -27,6 +27,14 @@ import '../features/student_portal/data/repositories/enrollment_repository_impl.
 import '../features/student_portal/domain/repositories/enrollment_repository.dart';
 import '../features/student_portal/presentation/cubit/enrollment_cubit.dart';
 import '../features/student_portal/presentation/cubit/student_dashboard_cubit.dart';
+import '../features/assignments/data/datasources/assignment_remote_data_source.dart';
+import '../features/assignments/data/repositories/assignment_repository_impl.dart';
+import '../features/assignments/domain/repositories/assignment_repository.dart';
+import '../features/assignments/presentation/cubit/assignment_detail_cubit.dart';
+import '../features/assignments/presentation/cubit/assignment_list_cubit.dart';
+import '../features/assignments/presentation/cubit/gradebook_cubit.dart';
+import '../features/assignments/presentation/cubit/grading_cubit.dart';
+import '../features/assignments/presentation/cubit/submission_cubit.dart';
 
 /// Root application widget configuring global providers, router, and reactive theming.
 class AcademicPortalApp extends StatefulWidget {
@@ -34,6 +42,7 @@ class AcademicPortalApp extends StatefulWidget {
   final CourseRepository? courseRepository;
   final InstructorDashboardRepository? instructorDashboardRepository;
   final EnrollmentRepository? enrollmentRepository;
+  final AssignmentRepository? assignmentRepository;
 
   const AcademicPortalApp({
     super.key,
@@ -41,6 +50,7 @@ class AcademicPortalApp extends StatefulWidget {
     this.courseRepository,
     this.instructorDashboardRepository,
     this.enrollmentRepository,
+    this.assignmentRepository,
   });
 
   @override
@@ -59,6 +69,12 @@ class _AcademicPortalAppState extends State<AcademicPortalApp> {
   late final EnrollmentRepository _enrollmentRepository;
   late final EnrollmentCubit _enrollmentCubit;
   late final StudentDashboardCubit _studentDashboardCubit;
+  late final AssignmentRepository _assignmentRepository;
+  late final AssignmentListCubit _assignmentListCubit;
+  late final AssignmentDetailCubit _assignmentDetailCubit;
+  late final SubmissionCubit _submissionCubit;
+  late final GradingCubit _gradingCubit;
+  late final GradebookCubit _gradebookCubit;
   late final GoRouter _router;
 
   @override
@@ -92,6 +108,12 @@ class _AcademicPortalAppState extends State<AcademicPortalApp> {
               EnrollmentRemoteDataSourceImpl(firestore: firestore),
         );
 
+    _assignmentRepository = widget.assignmentRepository ??
+        AssignmentRepositoryImpl(
+          remoteDataSource:
+              AssignmentRemoteDataSourceImpl(firestore: firestore),
+        );
+
     _authCubit = AuthCubit(authRepository: _authRepository);
     _themeCubit = ThemeCubit();
     _coursesCubit = CoursesCubit(repository: _courseRepository);
@@ -101,6 +123,12 @@ class _AcademicPortalAppState extends State<AcademicPortalApp> {
     _enrollmentCubit = EnrollmentCubit(repository: _enrollmentRepository);
     _studentDashboardCubit =
         StudentDashboardCubit(repository: _enrollmentRepository);
+    _assignmentListCubit = AssignmentListCubit(repository: _assignmentRepository);
+    _assignmentDetailCubit = AssignmentDetailCubit(repository: _assignmentRepository);
+    _submissionCubit = SubmissionCubit(repository: _assignmentRepository);
+    _gradingCubit = GradingCubit(repository: _assignmentRepository);
+    _gradebookCubit = GradebookCubit(repository: _assignmentRepository);
+
     _router = AppRouter.createRouter(_authCubit);
   }
 
@@ -113,33 +141,48 @@ class _AcademicPortalAppState extends State<AcademicPortalApp> {
     _instructorDashboardCubit.close();
     _enrollmentCubit.close();
     _studentDashboardCubit.close();
+    _assignmentListCubit.close();
+    _assignmentDetailCubit.close();
+    _submissionCubit.close();
+    _gradingCubit.close();
+    _gradebookCubit.close();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
+    return MultiRepositoryProvider(
       providers: [
-        BlocProvider<ThemeCubit>.value(value: _themeCubit),
-        BlocProvider<AuthCubit>.value(value: _authCubit),
-        BlocProvider<InstructorDashboardCubit>.value(
-            value: _instructorDashboardCubit),
-        BlocProvider<CoursesCubit>.value(value: _coursesCubit),
-        BlocProvider<CourseFormCubit>.value(value: _courseFormCubit),
-        BlocProvider<EnrollmentCubit>.value(value: _enrollmentCubit),
-        BlocProvider<StudentDashboardCubit>.value(value: _studentDashboardCubit),
+        RepositoryProvider<AssignmentRepository>.value(value: _assignmentRepository),
       ],
-      child: BlocBuilder<ThemeCubit, ThemeState>(
-        builder: (context, themeState) {
-          return MaterialApp.router(
-            title: AppConstants.appName,
-            debugShowCheckedModeBanner: false,
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: themeState.themeMode,
-            routerConfig: _router,
-          );
-        },
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider<ThemeCubit>.value(value: _themeCubit),
+          BlocProvider<AuthCubit>.value(value: _authCubit),
+          BlocProvider<InstructorDashboardCubit>.value(
+              value: _instructorDashboardCubit),
+          BlocProvider<CoursesCubit>.value(value: _coursesCubit),
+          BlocProvider<CourseFormCubit>.value(value: _courseFormCubit),
+          BlocProvider<EnrollmentCubit>.value(value: _enrollmentCubit),
+          BlocProvider<StudentDashboardCubit>.value(value: _studentDashboardCubit),
+          BlocProvider<AssignmentListCubit>.value(value: _assignmentListCubit),
+          BlocProvider<AssignmentDetailCubit>.value(value: _assignmentDetailCubit),
+          BlocProvider<SubmissionCubit>.value(value: _submissionCubit),
+          BlocProvider<GradingCubit>.value(value: _gradingCubit),
+          BlocProvider<GradebookCubit>.value(value: _gradebookCubit),
+        ],
+        child: BlocBuilder<ThemeCubit, ThemeState>(
+          builder: (context, themeState) {
+            return MaterialApp.router(
+              title: AppConstants.appName,
+              debugShowCheckedModeBanner: false,
+              theme: AppTheme.lightTheme,
+              darkTheme: AppTheme.darkTheme,
+              themeMode: themeState.themeMode,
+              routerConfig: _router,
+            );
+          },
+        ),
       ),
     );
   }

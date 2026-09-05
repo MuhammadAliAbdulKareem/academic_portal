@@ -470,64 +470,68 @@ class _InstructorDashboardScreenState extends State<InstructorDashboardScreen> {
               ),
               const Divider(height: AppSpacing.lg),
               ...loaded.deadlines.map((dl) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              dl.title,
-                              style: const TextStyle(fontWeight: FontWeight.bold),
-                              overflow: TextOverflow.ellipsis,
+                return InkWell(
+                  onTap: () => context.push('/assignments/asg-cs101-01/grade'),
+                  borderRadius: AppSpacing.roundedSm,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                dl.title,
+                                style: const TextStyle(fontWeight: FontWeight.bold),
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
-                          ),
-                          PortalBadge(
-                            label: dl.courseCode,
-                            variant: PortalBadgeVariant.neutral,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: AppSpacing.xs),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Submissions: ${dl.submittedCount} / ${dl.totalExpected}',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: isDark
-                                  ? AppColors.darkTextSecondary
-                                  : AppColors.lightTextSecondary,
+                            PortalBadge(
+                              label: dl.courseCode,
+                              variant: PortalBadgeVariant.neutral,
                             ),
-                          ),
-                          Text(
-                            '${(dl.completionRatio * 100).toStringAsFixed(0)}%',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primaryLight,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: AppSpacing.xs),
-                      ClipRRect(
-                        borderRadius: AppSpacing.roundedFull,
-                        child: LinearProgressIndicator(
-                          value: dl.completionRatio,
-                          minHeight: 6,
-                          backgroundColor: isDark
-                              ? AppColors.darkSurfaceAlt
-                              : AppColors.lightSurfaceAlt,
-                          valueColor: const AlwaysStoppedAnimation<Color>(
-                              AppColors.primaryLight),
+                          ],
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: AppSpacing.xs),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Submissions: ${dl.submittedCount} / ${dl.totalExpected}',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: isDark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors.lightTextSecondary,
+                              ),
+                            ),
+                            Text(
+                              '${(dl.completionRatio * 100).toStringAsFixed(0)}%',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primaryLight,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: AppSpacing.xs),
+                        ClipRRect(
+                          borderRadius: AppSpacing.roundedFull,
+                          child: LinearProgressIndicator(
+                            value: dl.completionRatio,
+                            minHeight: 6,
+                            backgroundColor: isDark
+                                ? AppColors.darkSurfaceAlt
+                                : AppColors.lightSurfaceAlt,
+                            valueColor: const AlwaysStoppedAnimation<Color>(
+                                AppColors.primaryLight),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               }),

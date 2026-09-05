@@ -517,20 +517,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
               return StudentDeadlineCard(
                 item: item,
                 onSubmit: () {
-                  final authState = context.read<AuthCubit>().state;
-                  final studentId = authState is Authenticated ? authState.user.id : 'demo-student-01';
-
-                  context.read<StudentDashboardCubit>().submitAssignment(
-                        studentId: studentId,
-                        deadlineId: item.id,
-                      );
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Submitted "${item.title}" successfully!'),
-                      backgroundColor: AppColors.success,
-                    ),
-                  );
+                  context.push('/assignments/asg-cs101-01');
                 },
               );
             },
