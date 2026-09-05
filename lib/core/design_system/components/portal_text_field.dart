@@ -47,7 +47,6 @@ class PortalTextField extends StatefulWidget {
 
 class _PortalTextFieldState extends State<PortalTextField> {
   late bool _obscureText;
-  bool _isFocused = false;
 
   @override
   void initState() {
@@ -98,10 +97,8 @@ class _PortalTextFieldState extends State<PortalTextField> {
           ),
           const SizedBox(height: AppSpacing.xs + 2),
         ],
-        Focus(
-          onFocusChange: (hasFocus) => setState(() => _isFocused = hasFocus),
-          child: TextFormField(
-            controller: widget.controller,
+        TextFormField(
+          controller: widget.controller,
             obscureText: _obscureText,
             keyboardType: widget.keyboardType,
             textInputAction: widget.textInputAction,
@@ -146,7 +143,6 @@ class _PortalTextFieldState extends State<PortalTextField> {
               ),
             ),
           ),
-        ),
       ],
     );
   }

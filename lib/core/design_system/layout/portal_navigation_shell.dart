@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/theme_cubit.dart';
 import '../../bloc/theme_state.dart';
 import '../../constants/app_constants.dart';
-import '../../responsive/breakpoint.dart';
 import '../../responsive/responsive_builder.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';

@@ -55,7 +55,7 @@ class _PortalCardState extends State<PortalCard> {
       duration: AppAnimations.fast,
       curve: AppAnimations.decelerate,
       transform: _isHovered && widget.isHoverable
-          ? (Matrix4.identity()..translate(0.0, -2.0, 0.0))
+          ? Matrix4.translationValues(0.0, -2.0, 0.0)
           : Matrix4.identity(),
       padding: widget.padding ?? const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(

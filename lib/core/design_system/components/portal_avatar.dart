@@ -48,7 +48,6 @@ class PortalAvatar extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    final initials = _extractInitials(name);
     final effectiveBg = backgroundColor ??
         (isDark ? AppColors.primary.withValues(alpha: 0.6) : AppColors.primaryLight.withValues(alpha: 0.15));
     final textColor = isDark ? Colors.white : AppColors.primary;

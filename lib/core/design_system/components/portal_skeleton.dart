@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
 
 /// Shimmer skeleton loader providing animated placeholder UI during data fetches.
