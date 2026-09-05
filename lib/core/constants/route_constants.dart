@@ -9,6 +9,7 @@ class RouteConstants {
   static const String register = '/register';
   static const String dashboard = '/dashboard';
   static const String instructorDashboard = '/instructor-dashboard';
+  static const String studentDashboard = '/student-dashboard';
   static const String courses = '/courses';
   static const String courseCreate = '/courses/create';
   static const String courseDetail = '/courses/:id';

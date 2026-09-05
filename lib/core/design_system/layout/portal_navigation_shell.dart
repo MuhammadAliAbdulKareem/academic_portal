@@ -57,7 +57,7 @@ class PortalNavigationShell extends StatefulWidget {
       label: 'Dashboard',
       icon: Icons.dashboard_outlined,
       selectedIcon: Icons.dashboard_rounded,
-      route: '/instructor-dashboard',
+      route: '/dashboard',
     ),
     PortalNavItem(
       label: 'Design System',

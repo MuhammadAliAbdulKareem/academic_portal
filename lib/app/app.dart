@@ -22,18 +22,25 @@ import '../features/instructor_dashboard/data/datasources/instructor_dashboard_r
 import '../features/instructor_dashboard/data/repositories/instructor_dashboard_repository_impl.dart';
 import '../features/instructor_dashboard/domain/repositories/instructor_dashboard_repository.dart';
 import '../features/instructor_dashboard/presentation/cubit/instructor_dashboard_cubit.dart';
+import '../features/student_portal/data/datasources/enrollment_remote_data_source.dart';
+import '../features/student_portal/data/repositories/enrollment_repository_impl.dart';
+import '../features/student_portal/domain/repositories/enrollment_repository.dart';
+import '../features/student_portal/presentation/cubit/enrollment_cubit.dart';
+import '../features/student_portal/presentation/cubit/student_dashboard_cubit.dart';
 
 /// Root application widget configuring global providers, router, and reactive theming.
 class AcademicPortalApp extends StatefulWidget {
   final AuthRepository? authRepository;
   final CourseRepository? courseRepository;
   final InstructorDashboardRepository? instructorDashboardRepository;
+  final EnrollmentRepository? enrollmentRepository;
 
   const AcademicPortalApp({
     super.key,
     this.authRepository,
     this.courseRepository,
     this.instructorDashboardRepository,
+    this.enrollmentRepository,
   });
 
   @override
@@ -49,6 +56,9 @@ class _AcademicPortalAppState extends State<AcademicPortalApp> {
   late final CourseFormCubit _courseFormCubit;
   late final InstructorDashboardRepository _instructorDashboardRepository;
   late final InstructorDashboardCubit _instructorDashboardCubit;
+  late final EnrollmentRepository _enrollmentRepository;
+  late final EnrollmentCubit _enrollmentCubit;
+  late final StudentDashboardCubit _studentDashboardCubit;
   late final GoRouter _router;
 
   @override
@@ -76,12 +86,21 @@ class _AcademicPortalAppState extends State<AcademicPortalApp> {
               InstructorDashboardRemoteDataSourceImpl(firestore: firestore),
         );
 
+    _enrollmentRepository = widget.enrollmentRepository ??
+        EnrollmentRepositoryImpl(
+          remoteDataSource:
+              EnrollmentRemoteDataSourceImpl(firestore: firestore),
+        );
+
     _authCubit = AuthCubit(authRepository: _authRepository);
     _themeCubit = ThemeCubit();
     _coursesCubit = CoursesCubit(repository: _courseRepository);
     _courseFormCubit = CourseFormCubit(repository: _courseRepository);
     _instructorDashboardCubit =
         InstructorDashboardCubit(repository: _instructorDashboardRepository);
+    _enrollmentCubit = EnrollmentCubit(repository: _enrollmentRepository);
+    _studentDashboardCubit =
+        StudentDashboardCubit(repository: _enrollmentRepository);
     _router = AppRouter.createRouter(_authCubit);
   }
 
@@ -92,6 +111,8 @@ class _AcademicPortalAppState extends State<AcademicPortalApp> {
     _coursesCubit.close();
     _courseFormCubit.close();
     _instructorDashboardCubit.close();
+    _enrollmentCubit.close();
+    _studentDashboardCubit.close();
     super.dispose();
   }
 
@@ -105,6 +126,8 @@ class _AcademicPortalAppState extends State<AcademicPortalApp> {
             value: _instructorDashboardCubit),
         BlocProvider<CoursesCubit>.value(value: _coursesCubit),
         BlocProvider<CourseFormCubit>.value(value: _courseFormCubit),
+        BlocProvider<EnrollmentCubit>.value(value: _enrollmentCubit),
+        BlocProvider<StudentDashboardCubit>.value(value: _studentDashboardCubit),
       ],
       child: BlocBuilder<ThemeCubit, ThemeState>(
         builder: (context, themeState) {
