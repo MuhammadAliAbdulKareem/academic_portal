@@ -367,16 +367,20 @@ class _InstructorDashboardScreenState extends State<InstructorDashboardScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: AppSpacing.sm,
+                runSpacing: AppSpacing.xs,
                 children: [
                   Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       const Icon(Icons.history_rounded, size: 20, color: AppColors.info),
                       const SizedBox(width: AppSpacing.sm),
                       Text(
                         'Recent Student Activity',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
                       ),
@@ -464,11 +468,14 @@ class _InstructorDashboardScreenState extends State<InstructorDashboardScreen> {
                   const Icon(Icons.assignment_turned_in_outlined,
                       size: 20, color: AppColors.secondary),
                   const SizedBox(width: AppSpacing.sm),
-                  Text(
-                    'Grading Queue & Deadlines',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                  Expanded(
+                    child: Text(
+                      'Grading Queue & Deadlines',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ],
               ),

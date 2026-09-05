@@ -14,19 +14,17 @@ class InstructorDashboardCubit extends Cubit<InstructorDashboardState> {
   Future<void> loadDashboard(String instructorId) async {
     emit(const InstructorDashboardLoading());
     try {
-      final results = await Future.wait([
-        _repository.getStats(instructorId),
-        _repository.getCourses(instructorId),
-        _repository.getRecentActivities(instructorId),
-        _repository.getUpcomingDeadlines(instructorId),
-      ]);
+      final stats = await _repository.getStats(instructorId);
+      final courses = await _repository.getCourses(instructorId);
+      final activities = await _repository.getRecentActivities(instructorId);
+      final deadlines = await _repository.getUpcomingDeadlines(instructorId);
 
       emit(
         InstructorDashboardLoaded(
-          stats: results[0] as dynamic,
-          courses: results[1] as dynamic,
-          activities: results[2] as dynamic,
-          deadlines: results[3] as dynamic,
+          stats: stats,
+          courses: courses,
+          activities: activities,
+          deadlines: deadlines,
         ),
       );
     } catch (e) {
@@ -36,19 +34,17 @@ class InstructorDashboardCubit extends Cubit<InstructorDashboardState> {
 
   Future<void> refreshDashboard(String instructorId) async {
     try {
-      final results = await Future.wait([
-        _repository.getStats(instructorId),
-        _repository.getCourses(instructorId),
-        _repository.getRecentActivities(instructorId),
-        _repository.getUpcomingDeadlines(instructorId),
-      ]);
+      final stats = await _repository.getStats(instructorId);
+      final courses = await _repository.getCourses(instructorId);
+      final activities = await _repository.getRecentActivities(instructorId);
+      final deadlines = await _repository.getUpcomingDeadlines(instructorId);
 
       emit(
         InstructorDashboardLoaded(
-          stats: results[0] as dynamic,
-          courses: results[1] as dynamic,
-          activities: results[2] as dynamic,
-          deadlines: results[3] as dynamic,
+          stats: stats,
+          courses: courses,
+          activities: activities,
+          deadlines: deadlines,
         ),
       );
     } catch (e) {

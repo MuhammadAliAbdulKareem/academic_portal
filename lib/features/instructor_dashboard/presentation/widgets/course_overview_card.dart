@@ -29,8 +29,11 @@ class CourseOverviewCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: AppSpacing.xs,
+            runSpacing: AppSpacing.xs,
             children: [
               PortalBadge(
                 label: course.code,
@@ -38,8 +41,8 @@ class CourseOverviewCard extends StatelessWidget {
               ),
               Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.sm,
-                  vertical: AppSpacing.xs,
+                  horizontal: AppSpacing.xs + 2,
+                  vertical: AppSpacing.xxs,
                 ),
                 decoration: BoxDecoration(
                   color: isDark ? AppColors.darkSurfaceAlt : AppColors.lightSurfaceAlt,
@@ -50,14 +53,14 @@ class CourseOverviewCard extends StatelessWidget {
                   children: [
                     Icon(
                       Icons.groups_outlined,
-                      size: 14,
+                      size: 13,
                       color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
                     ),
                     const SizedBox(width: 4),
                     Text(
                       '${course.enrolledCount} Students',
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 11,
                         fontWeight: FontWeight.w600,
                         color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
                       ),
