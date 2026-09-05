@@ -4,6 +4,43 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.9.0] - 2026-09-06 — Quizzes, Interactive Exams & Assessment Engine
+
+### Added
+- Domain Layer:
+  - `QuestionType` (`singleChoice`, `multipleChoice`, `trueFalse`, `shortAnswer`), `QuizQuestionEntity`, `QuizEntity`, `QuizAttemptEntity`, and `QuizSummaryStatsEntity`.
+  - `QuizRepository` contract covering quiz catalog listings, course filtering, active/archived state, quiz authoring/creation, live exam submissions, automatic grading, attempt scorecards, and assessment analytics.
+- Data Layer:
+  - `QuizQuestionModel`, `QuizModel`, `QuizAttemptModel`, and `QuizSummaryStatsModel` with full Firestore & JSON serialization/deserialization.
+  - `QuizRemoteDataSource` and `QuizRemoteDataSourceImpl` pre-seeded with multi-discipline question banks across CS101, CS201, and MATH301, instant auto-grading algorithms, attempt logs, and cohort performance statistics.
+  - `QuizRepositoryImpl` connecting domain use cases with robust `ServerException` error handling.
+- State Management:
+  - `QuizListCubit` & `QuizListState` with real-time course filters, search queries, status tabs (All, Published, Draft, Closed), and quiz creation.
+  - `QuizDetailCubit` & `QuizDetailState` orchestrating quiz details, rules, allowed attempts, past attempt scorecards, and exam prerequisites.
+  - `QuizExamSessionCubit` & `QuizExamSessionState` driving the live exam experience: synchronized countdown timer, question navigation palette, question response staging (single-choice, multiple-choice, true/false, short answer text), question bookmark/flagging, and auto-submit upon timer expiration.
+  - `QuizBuilderCubit` & `QuizBuilderState` supporting faculty exam creation with dynamic question adding, option management, auto-calculated total points, and parameter configuration (duration, passing score, shuffle, attempt limits).
+  - `QuizAnalyticsCubit` & `QuizAnalyticsState` computing class averages, median scores, pass rates, question difficulty analysis, student score distribution rosters, and CSV exports.
+- Presentation Components & Screens:
+  - `QuizCard`: Adaptive catalog card with course badge, question count, point tally, time duration, and status indicators.
+  - `ExamTimerWidget`: Urgency-aware live countdown indicator with color-coded warning thresholds and tabular MM:SS time display.
+  - `QuestionPaletteWidget`: Interactive question matrix indicating answered, unanswered, flagged, and currently active questions for quick jumping.
+  - `QuestionViewCard`: Dynamic question renderer with styled options for single-choice, multiple-choice, boolean true/false, and short answer inputs.
+  - `QuizResultCard`: Comprehensive assessment scorecard featuring score percentage gauge, pass/fail status badge, and detailed question-by-question review with answer keys and explanations.
+  - `QuizListScreen`: Unified assessment catalog with search, course filters, status tabs, and faculty builder launcher.
+  - `QuizDetailScreen`: Pre-exam overview screen with exam instructions, syllabus topic tags, and student attempt histories.
+  - `QuizExamScreen`: Fullscreen focused exam hall with sticky timer header, question view, side palette, flag toggles, and submission confirmation modal.
+  - `QuizBuilderScreen`: Interactive authoring studio for creating exams with dynamic question bank builders and instant point calculations.
+  - `QuizAnalyticsScreen`: Faculty dashboard with grade metrics, score distribution breakdown, student roster table, and CSV report export.
+- Routing & Navigation Integration:
+  - Added routes `RouteConstants.quizzes` (`/quizzes`), `quizzesCreate` (`/quizzes/create`), `quizDetail` (`/quizzes/:id`), `quizTake` (`/quizzes/:id/take`), and `quizAnalytics` (`/quizzes/:id/analytics`).
+  - Added `Quizzes` item to primary navigation sidebar and mobile drawer in `PortalNavigationShell`.
+  - Registered `QuizRepository` and all 5 cubits (`QuizListCubit`, `QuizDetailCubit`, `QuizExamSessionCubit`, `QuizBuilderCubit`, `QuizAnalyticsCubit`) in `AcademicPortalApp` root provider tree.
+- Quality Assurance:
+  - 15 comprehensive unit and widget tests in `test/quizzes_test.dart` verifying data sources, scoring logic, attempt calculation, and presentation widgets.
+  - 70/70 tests passing cleanly across the entire project test suite (`flutter test`).
+  - 0 static analysis issues (`flutter analyze` with 0 warnings/errors).
+  - Verified production build with `flutter build web --release`.
+
 ## [v0.8.0] - 2026-09-06 — Live Attendance & QR Code Check-in System
 
 ### Added
