@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.3.0] - 2026-09-05 — Authentication
+
+### Added
+- Domain entity `UserEntity` and `UserRole` (`Instructor`, `Student`) defining role permissions.
+- `AuthRepository` and `AuthRepositoryImpl` with `FirebaseAuth` integration and fallback persistence.
+- `UserModel` data transfer object with Firestore and JSON serialization.
+- `AuthCubit` state management handling registration, login, logout, and session state emissions.
+- Modern `LoginScreen` with form validation, password visibility toggle, error notifications, and quick demo credentials shortcuts.
+- `RegisterScreen` featuring visual academic role selector (`Instructor` vs `Student`), field validations, and confirmation matching.
+- Protected route redirection guards in `AppRouter` based on active authentication state.
+- Dynamic user profile pill and role badges in `PortalNavigationShell` header with quick sign-out.
+- Comprehensive unit and widget tests for authentication flows (13 total test cases passing).
+
+### Technical Details
+- Zero static analysis or lint warnings (`flutter analyze`).
+- Web release compilation verified (`flutter build web --release`).
+
 ## [v0.2.0] - 2026-09-05 — Design System
 
 ### Added

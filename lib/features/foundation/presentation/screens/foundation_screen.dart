@@ -10,6 +10,8 @@ import '../../../../core/responsive/responsive_builder.dart';
 import '../../../../core/responsive/responsive_extensions.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../auth/presentation/cubit/auth_cubit.dart';
+import '../../../auth/presentation/cubit/auth_state.dart';
 
 /// Interactive Foundation status and design verification dashboard screen.
 class FoundationScreen extends StatelessWidget {
@@ -70,6 +72,26 @@ class FoundationScreen extends StatelessWidget {
                 onSelectionChanged: (newSelection) {
                   context.read<ThemeCubit>().setThemeMode(newSelection.first);
                 },
+              );
+            },
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          BlocBuilder<AuthCubit, AuthState>(
+            builder: (context, authState) {
+              if (authState is Authenticated) {
+                return TextButton.icon(
+                  onPressed: () => context.read<AuthCubit>().logout(),
+                  icon: const Icon(Icons.logout_rounded, size: 16),
+                  label: Text(
+                    'Sign Out (${authState.user.displayName.split(' ').first})',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                );
+              }
+              return ElevatedButton.icon(
+                onPressed: () => context.go(RouteConstants.login),
+                icon: const Icon(Icons.login_rounded, size: 16),
+                label: const Text('Sign In'),
               );
             },
           ),
@@ -352,6 +374,21 @@ class FoundationScreen extends StatelessWidget {
               FirebaseConfig.isInitialized ? AppColors.success : AppColors.warning,
             ),
             const Divider(height: AppSpacing.lg),
+            BlocBuilder<AuthCubit, AuthState>(
+              builder: (context, authState) {
+                final isAuth = authState is Authenticated;
+                final statusText = isAuth
+                    ? '${authState.user.displayName} (${authState.user.role.displayName})'
+                    : 'Unauthenticated (Guest)';
+                return _buildStatusRow(
+                  context,
+                  'Authentication Session',
+                  statusText,
+                  isAuth ? AppColors.success : AppColors.info,
+                );
+              },
+            ),
+            const Divider(height: AppSpacing.lg),
             _buildStatusRow(
               context,
               'Viewport Breakpoint',
@@ -362,7 +399,7 @@ class FoundationScreen extends StatelessWidget {
             _buildStatusRow(
               context,
               'Git Branch & Milestone',
-              'feature/project-foundation • v0.1.0',
+              'feature/authentication • v0.3.0',
               AppColors.secondary,
             ),
           ],
