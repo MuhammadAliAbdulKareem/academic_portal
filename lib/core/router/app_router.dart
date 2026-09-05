@@ -9,6 +9,9 @@ import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/design_system/presentation/screens/design_system_screen.dart';
 import '../../features/foundation/presentation/screens/foundation_screen.dart';
 import '../../features/instructor_dashboard/presentation/screens/instructor_dashboard_screen.dart';
+import '../../features/courses/presentation/screens/course_create_screen.dart';
+import '../../features/courses/presentation/screens/course_detail_screen.dart';
+import '../../features/courses/presentation/screens/course_list_screen.dart';
 
 /// Helper to bridge Stream changes to GoRouter's Listenable refresh.
 class GoRouterRefreshStream extends ChangeNotifier {
@@ -95,6 +98,24 @@ class AppRouter {
           path: RouteConstants.instructorDashboard,
           name: 'instructor-dashboard',
           builder: (context, state) => const InstructorDashboardScreen(),
+        ),
+        GoRoute(
+          path: RouteConstants.courses,
+          name: 'courses',
+          builder: (context, state) => const CourseListScreen(),
+        ),
+        GoRoute(
+          path: RouteConstants.courseCreate,
+          name: 'course-create',
+          builder: (context, state) => const CourseCreateScreen(),
+        ),
+        GoRoute(
+          path: RouteConstants.courseDetail,
+          name: 'course-detail',
+          builder: (context, state) {
+            final courseId = state.pathParameters['id'] ?? '';
+            return CourseDetailScreen(courseId: courseId);
+          },
         ),
       ],
       errorBuilder: (context, state) => Scaffold(

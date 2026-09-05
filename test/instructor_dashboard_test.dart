@@ -150,6 +150,11 @@ void main() {
             path: '/instructor-dashboard',
             builder: (_, __) => const InstructorDashboardScreen(),
           ),
+          GoRoute(
+            path: '/courses/create',
+            builder: (_, __) =>
+                const Scaffold(body: Text('Course Creation Screen')),
+          ),
         ],
       );
 
@@ -184,15 +189,12 @@ void main() {
       expect(find.text('Data Structures & Algorithms'), findsOneWidget);
       expect(find.text('CS-420'), findsWidgets);
 
-      // Test tapping action button triggers SnackBar
+      // Test tapping action button navigates to Course Creation
       await tester.ensureVisible(find.text('+ Create New Course'));
       await tester.tap(find.text('+ Create New Course'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
-      expect(
-        find.text('Course Creation module is scheduled for Feature 5!'),
-        findsOneWidget,
-      );
+      expect(find.text('Course Creation Screen'), findsOneWidget);
 
       await dashboardCubit.close();
       await fakeAuthCubit.close();

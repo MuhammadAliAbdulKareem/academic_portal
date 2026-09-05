@@ -50,6 +50,8 @@ class _InstructorDashboardScreenState extends State<InstructorDashboardScreen> {
           context.go(RouteConstants.root);
         } else if (index == 2) {
           context.go(RouteConstants.designSystem);
+        } else if (index == 3) {
+          context.go(RouteConstants.courses);
         }
       },
       child: BlocBuilder<InstructorDashboardCubit, InstructorDashboardState>(
@@ -195,14 +197,7 @@ class _InstructorDashboardScreenState extends State<InstructorDashboardScreen> {
             label: '+ Create New Course',
             variant: PortalButtonVariant.secondary,
             size: PortalButtonSize.md,
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Course Creation module is scheduled for Feature 5!'),
-                  duration: Duration(seconds: 2),
-                ),
-              );
-            },
+            onPressed: () => context.go(RouteConstants.courseCreate),
           );
 
           if (isMobile) {
@@ -307,7 +302,7 @@ class _InstructorDashboardScreenState extends State<InstructorDashboardScreen> {
               ),
             ),
             TextButton(
-              onPressed: () {},
+              onPressed: () => context.go(RouteConstants.courses),
               child: const Text('View All Courses',
                   style: TextStyle(fontWeight: FontWeight.bold)),
             ),
@@ -334,14 +329,8 @@ class _InstructorDashboardScreenState extends State<InstructorDashboardScreen> {
                       width: cardWidth,
                       child: CourseOverviewCard(
                         course: course,
-                        onManageCourse: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Managing ${course.code}: ${course.title}'),
-                              duration: const Duration(seconds: 1),
-                            ),
-                          );
-                        },
+                        onManageCourse: () =>
+                            context.go('/courses/${course.id}'),
                       ),
                     );
                   }).toList(),
