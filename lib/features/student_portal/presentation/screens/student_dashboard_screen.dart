@@ -47,11 +47,19 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
   Future<void> _handleRefresh() async {
     final authState = context.read<AuthCubit>().state;
     final studentId = authState is Authenticated ? authState.user.id : 'demo-student-01';
-    await context.read<StudentDashboardCubit>().refreshDashboard(studentId);
-    await context.read<EnrollmentCubit>().loadEnrollments(studentId);
+    final dashboardCubit = context.read<StudentDashboardCubit>();
+    final enrollmentCubit = context.read<EnrollmentCubit>();
+    await dashboardCubit.refreshDashboard(studentId);
+    if (!mounted) return;
+    await enrollmentCubit.loadEnrollments(studentId);
   }
 
   void _confirmDropCourse(BuildContext context, EnrollmentEntity enrollment) {
+    final authState = context.read<AuthCubit>().state;
+    final studentId = authState is Authenticated ? authState.user.id : 'demo-student-01';
+    final enrollmentCubit = context.read<EnrollmentCubit>();
+    final messenger = ScaffoldMessenger.of(context);
+
     showDialog<bool>(
       context: context,
       builder: (dialogCtx) => AlertDialog(
@@ -72,17 +80,14 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
         ],
       ),
     ).then((confirmed) {
-      if (confirmed == true && mounted) {
-        final authState = context.read<AuthCubit>().state;
-        final studentId = authState is Authenticated ? authState.user.id : 'demo-student-01';
-
-        context.read<EnrollmentCubit>().drop(
-              studentId: studentId,
-              courseId: enrollment.courseId,
-            ).then((_) {
-          _handleRefresh();
+      if (confirmed == true) {
+        enrollmentCubit.drop(
+          studentId: studentId,
+          courseId: enrollment.courseId,
+        ).then((_) {
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
+            _handleRefresh();
+            messenger.showSnackBar(
               SnackBar(
                 content: Text('Dropped ${enrollment.courseCode} successfully.'),
                 backgroundColor: AppColors.secondary,
@@ -239,7 +244,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                             const SizedBox(width: AppSpacing.xs),
                             const PortalBadge(
                               label: 'Fall 2026',
-                              variant: PortalBadgeVariant.category,
+                              variant: PortalBadgeVariant.info,
                             ),
                           ],
                         ),
@@ -287,7 +292,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
             value: stats.gpa.toStringAsFixed(2),
             icon: Icons.stars_rounded,
             color: AppColors.primary,
-            trendBadge: '+0.12 this term',
+            trendBadge: '+0.12',
             subtitle: stats.academicStanding,
           ),
           MetricCard(
@@ -314,14 +319,23 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
           ),
         ];
 
-        return GridView.count(
-          crossAxisCount: columns,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          mainAxisSpacing: AppSpacing.md,
-          crossAxisSpacing: AppSpacing.md,
-          childAspectRatio: sizing.isMobile ? 2.3 : 1.35,
-          children: cards,
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            final cardWidth = (constraints.maxWidth -
+                    ((columns - 1) * AppSpacing.md)) /
+                columns;
+
+            return Wrap(
+              spacing: AppSpacing.md,
+              runSpacing: AppSpacing.md,
+              children: cards.map((card) {
+                return SizedBox(
+                  width: cardWidth,
+                  child: card,
+                );
+              }).toList(),
+            );
+          },
         );
       },
     );
@@ -417,8 +431,8 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
             title: 'No Registered Courses',
             description:
                 'You haven\'t enrolled in any courses for the Fall 2026 term yet. Explore the course catalog to begin.',
-            buttonLabel: 'Browse Academic Catalog',
-            onButtonPressed: () => context.go(RouteConstants.courses),
+            actionLabel: 'Browse Academic Catalog',
+            onActionPressed: () => context.go(RouteConstants.courses),
           )
         else
           ResponsiveBuilder(
@@ -430,22 +444,25 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
                 columns = 2;
               }
 
-              return GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: courses.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: columns,
-                  mainAxisSpacing: AppSpacing.md,
-                  crossAxisSpacing: AppSpacing.md,
-                  childAspectRatio: sizing.isMobile ? 1.05 : 0.88,
-                ),
-                itemBuilder: (context, index) {
-                  final enr = courses[index];
-                  return EnrolledCourseCard(
-                    enrollment: enr,
-                    onViewDetails: () => context.go('/courses/${enr.courseId}'),
-                    onDrop: () => _confirmDropCourse(context, enr),
+              return LayoutBuilder(
+                builder: (context, constraints) {
+                  final cardWidth = (constraints.maxWidth -
+                          ((columns - 1) * AppSpacing.md)) /
+                      columns;
+
+                  return Wrap(
+                    spacing: AppSpacing.md,
+                    runSpacing: AppSpacing.md,
+                    children: courses.map((enr) {
+                      return SizedBox(
+                        width: cardWidth,
+                        child: EnrolledCourseCard(
+                          enrollment: enr,
+                          onViewDetails: () => context.go('/courses/${enr.courseId}'),
+                          onDrop: () => _confirmDropCourse(context, enr),
+                        ),
+                      );
+                    }).toList(),
                   );
                 },
               );
@@ -527,15 +544,15 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
       children: [
         Row(
           children: const [
-            Expanded(child: PortalSkeleton(height: 120)),
+            Expanded(child: PortalSkeleton.card(height: 120)),
             SizedBox(width: AppSpacing.md),
-            Expanded(child: PortalSkeleton(height: 120)),
+            Expanded(child: PortalSkeleton.card(height: 120)),
           ],
         ),
         const SizedBox(height: AppSpacing.md),
-        const PortalSkeleton(height: 180),
+        const PortalSkeleton.card(height: 180),
         const SizedBox(height: AppSpacing.md),
-        const PortalSkeleton(height: 240),
+        const PortalSkeleton.card(height: 240),
       ],
     );
   }

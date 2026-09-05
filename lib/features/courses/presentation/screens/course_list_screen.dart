@@ -37,6 +37,14 @@ class _CourseListScreenState extends State<CourseListScreen> {
     'Mathematics',
   ];
 
+  EnrollmentCubit? get _enrollmentCubit {
+    try {
+      return context.read<EnrollmentCubit>();
+    } catch (_) {
+      return null;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -279,6 +287,25 @@ class _CourseListScreenState extends State<CourseListScreen> {
             final cardWidth = (constraints.maxWidth -
                     ((crossAxisCount - 1) * AppSpacing.md)) /
                 crossAxisCount;
+
+            final cubit = _enrollmentCubit;
+            if (cubit == null) {
+              return Wrap(
+                spacing: AppSpacing.md,
+                runSpacing: AppSpacing.md,
+                children: loaded.courses.map((course) {
+                  return SizedBox(
+                    width: cardWidth,
+                    child: CourseCard(
+                      course: course,
+                      onTap: () {
+                        context.go('/courses/${course.id}');
+                      },
+                    ),
+                  );
+                }).toList(),
+              );
+            }
 
             return BlocBuilder<EnrollmentCubit, EnrollmentState>(
               builder: (context, enrollState) {

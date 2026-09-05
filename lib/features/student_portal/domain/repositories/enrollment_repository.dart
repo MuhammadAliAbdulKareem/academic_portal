@@ -1,4 +1,4 @@
-import '../../courses/domain/entities/course_entity.dart';
+import 'package:academic_portal/features/courses/domain/entities/course_entity.dart';
 import '../entities/enrollment_entity.dart';
 
 /// Contract interface for student enrollment and academic dashboard data.

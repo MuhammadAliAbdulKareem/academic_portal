@@ -31,16 +31,20 @@ class EnrolledCourseCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header: Department, Term, and Grade
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: AppSpacing.xs,
+            runSpacing: AppSpacing.xs,
             children: [
-              Row(
+              Wrap(
+                spacing: AppSpacing.xs,
+                runSpacing: AppSpacing.xs,
                 children: [
                   PortalBadge(
                     label: enrollment.department,
-                    variant: PortalBadgeVariant.category,
+                    variant: PortalBadgeVariant.info,
                   ),
-                  const SizedBox(width: AppSpacing.xs),
                   PortalBadge(
                     label: '${enrollment.credits} Credits',
                     variant: PortalBadgeVariant.neutral,
@@ -118,8 +122,11 @@ class EnrolledCourseCard extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: AppSpacing.xs,
+                runSpacing: 2,
                 children: [
                   Text(
                     'Syllabus Progress',
@@ -132,7 +139,7 @@ class EnrolledCourseCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '${(enrollment.progressRatio * 100).toInt()}% • Module ${enrollment.completedModules}/${enrollment.totalModules}',
+                    '${(enrollment.progressRatio * 100).toInt()}% • Mod ${enrollment.completedModules}/${enrollment.totalModules}',
                     style: const TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
@@ -155,7 +162,7 @@ class EnrolledCourseCard extends StatelessWidget {
               ),
             ],
           ),
-          const Spacer(),
+          const SizedBox(height: AppSpacing.md),
           const Divider(height: AppSpacing.lg),
 
           // Actions

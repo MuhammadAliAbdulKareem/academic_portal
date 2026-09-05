@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../../core/firebase/firebase_config.dart';
-import '../../courses/domain/entities/course_entity.dart';
+import 'package:academic_portal/features/courses/domain/entities/course_entity.dart';
 import '../../domain/entities/enrollment_entity.dart';
 import '../models/enrollment_model.dart';
 
@@ -207,7 +207,7 @@ class EnrollmentRemoteDataSourceImpl implements EnrollmentRemoteDataSource {
   Future<StudentDashboardStats> getStats(String studentId) async {
     final enrollments = await getEnrollments(studentId);
     final activeCount = enrollments.length;
-    final enrolledCredits = enrollments.fold<int>(0, (sum, e) => sum + e.credits);
+    final enrolledCredits = enrollments.fold<int>(0, (total, e) => total + e.credits);
     final pendingCount = _mockDeadlines.where((d) => d.isPending).length;
 
     return StudentDashboardStats(

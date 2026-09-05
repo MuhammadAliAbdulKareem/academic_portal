@@ -1,4 +1,4 @@
-import '../../courses/domain/entities/course_entity.dart';
+import 'package:academic_portal/features/courses/domain/entities/course_entity.dart';
 import '../../domain/entities/enrollment_entity.dart';
 import '../../domain/repositories/enrollment_repository.dart';
 import '../datasources/enrollment_remote_data_source.dart';

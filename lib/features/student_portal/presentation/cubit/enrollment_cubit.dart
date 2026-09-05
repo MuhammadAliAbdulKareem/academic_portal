@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../courses/domain/entities/course_entity.dart';
+import 'package:academic_portal/features/courses/domain/entities/course_entity.dart';
+import '../../domain/entities/enrollment_entity.dart';
 import '../../domain/repositories/enrollment_repository.dart';
 import 'enrollment_state.dart';
 
@@ -29,8 +30,8 @@ class EnrollmentCubit extends Cubit<EnrollmentState> {
   }) async {
     _currentStudentId = studentId;
     final currentState = state;
-    final currentList =
-        currentState is EnrollmentLoaded ? currentState.enrollments : [];
+    final List<EnrollmentEntity> currentList =
+        currentState is EnrollmentLoaded ? currentState.enrollments : <EnrollmentEntity>[];
 
     // Check if already enrolled
     if (currentState is EnrollmentLoaded && currentState.isEnrolled(course.id)) {
@@ -51,7 +52,7 @@ class EnrollmentCubit extends Cubit<EnrollmentState> {
       emit(
         EnrollmentError(
           'Cannot register: Enrolling in ${course.code} (${course.credits} credits) would exceed the maximum limit of 18 credit hours per semester.',
-          previousEnrollments: currentList.cast(),
+          previousEnrollments: currentList,
         ),
       );
       return;
@@ -82,7 +83,7 @@ class EnrollmentCubit extends Cubit<EnrollmentState> {
       emit(
         EnrollmentError(
           e.toString(),
-          previousEnrollments: currentList.cast(),
+          previousEnrollments: currentList,
         ),
       );
     }
@@ -94,8 +95,8 @@ class EnrollmentCubit extends Cubit<EnrollmentState> {
   }) async {
     _currentStudentId = studentId;
     final currentState = state;
-    final currentList =
-        currentState is EnrollmentLoaded ? currentState.enrollments : [];
+    final List<EnrollmentEntity> currentList =
+        currentState is EnrollmentLoaded ? currentState.enrollments : <EnrollmentEntity>[];
 
     try {
       await _repository.dropCourse(studentId: studentId, courseId: courseId);
@@ -111,7 +112,7 @@ class EnrollmentCubit extends Cubit<EnrollmentState> {
       emit(
         EnrollmentError(
           e.toString(),
-          previousEnrollments: currentList.cast(),
+          previousEnrollments: currentList,
         ),
       );
     }

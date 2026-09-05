@@ -43,35 +43,29 @@ class CourseCard extends StatelessWidget {
                 spacing: AppSpacing.xs,
                 runSpacing: AppSpacing.xs,
                 children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      PortalBadge(
-                        label: course.code,
-                        variant: PortalBadgeVariant.primary,
+                  PortalBadge(
+                    label: course.code,
+                    variant: PortalBadgeVariant.primary,
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm,
+                      vertical: AppSpacing.xxs,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isDark ? AppColors.darkSurfaceAlt : AppColors.lightSurfaceAlt,
+                      borderRadius: AppSpacing.roundedSm,
+                    ),
+                    child: Text(
+                      course.department,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.lightTextSecondary,
                       ),
-                      const SizedBox(width: AppSpacing.xs),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.sm,
-                          vertical: AppSpacing.xxs,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isDark ? AppColors.darkSurfaceAlt : AppColors.lightSurfaceAlt,
-                          borderRadius: AppSpacing.roundedSm,
-                        ),
-                        child: Text(
-                          course.department,
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: isDark
-                                ? AppColors.darkTextSecondary
-                                : AppColors.lightTextSecondary,
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                   if (isEnrolled)
                     const PortalBadge(

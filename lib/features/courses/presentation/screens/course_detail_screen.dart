@@ -38,37 +38,52 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
+  EnrollmentCubit? get _enrollmentCubit {
+    try {
+      return context.read<EnrollmentCubit>();
+    } catch (_) {
+      return null;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     context.read<CoursesCubit>().loadCourseDetails(widget.courseId);
 
-    final authState = context.read<AuthCubit>().state;
-    final studentId = authState is Authenticated ? authState.user.id : 'demo-student-01';
-    context.read<EnrollmentCubit>().loadEnrollments(studentId);
+    final cubit = _enrollmentCubit;
+    if (cubit != null) {
+      final authState = context.read<AuthCubit>().state;
+      final studentId = authState is Authenticated ? authState.user.id : 'demo-student-01';
+      cubit.loadEnrollments(studentId);
+    }
   }
 
   void _enrollCourse(BuildContext context, CourseEntity course) {
     final authState = context.read<AuthCubit>().state;
     final studentId = authState is Authenticated ? authState.user.id : 'demo-student-01';
+    final enrollmentCubit = context.read<EnrollmentCubit>();
+    final coursesCubit = context.read<CoursesCubit>();
+    final messenger = ScaffoldMessenger.of(context);
 
-    context.read<EnrollmentCubit>().enroll(
+    enrollmentCubit.enroll(
           studentId: studentId,
           course: course,
         ).then((_) {
-      final enrollState = context.read<EnrollmentCubit>().state;
+      if (!mounted) return;
+      final enrollState = enrollmentCubit.state;
       if (enrollState is EnrollmentLoaded && enrollState.isActionSuccess) {
         // Refresh details to reflect updated seat count
-        context.read<CoursesCubit>().loadCourseDetails(course.id);
-        ScaffoldMessenger.of(context).showSnackBar(
+        coursesCubit.loadCourseDetails(course.id);
+        messenger.showSnackBar(
           SnackBar(
             content: Text(enrollState.message ?? 'Enrolled in ${course.code} successfully!'),
             backgroundColor: AppColors.success,
           ),
         );
       } else if (enrollState is EnrollmentError) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        messenger.showSnackBar(
           SnackBar(
             content: Text(enrollState.message),
             backgroundColor: AppColors.error,
@@ -79,6 +94,12 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
   }
 
   void _confirmDropCourse(BuildContext context, CourseEntity course) {
+    final enrollmentCubit = context.read<EnrollmentCubit>();
+    final coursesCubit = context.read<CoursesCubit>();
+    final messenger = ScaffoldMessenger.of(context);
+    final authState = context.read<AuthCubit>().state;
+    final studentId = authState is Authenticated ? authState.user.id : 'demo-student-01';
+
     showDialog<bool>(
       context: context,
       builder: (dialogCtx) => AlertDialog(
@@ -100,21 +121,18 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
       ),
     ).then((confirmed) {
       if (confirmed == true && mounted) {
-        final authState = context.read<AuthCubit>().state;
-        final studentId = authState is Authenticated ? authState.user.id : 'demo-student-01';
-        context.read<EnrollmentCubit>().drop(
+        enrollmentCubit.drop(
               studentId: studentId,
               courseId: course.id,
             ).then((_) {
-          context.read<CoursesCubit>().loadCourseDetails(course.id);
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Dropped ${course.code} successfully.'),
-                backgroundColor: AppColors.secondary,
-              ),
-            );
-          }
+          if (!mounted) return;
+          coursesCubit.loadCourseDetails(course.id);
+          messenger.showSnackBar(
+            SnackBar(
+              content: Text('Dropped ${course.code} successfully.'),
+              backgroundColor: AppColors.secondary,
+            ),
+          );
         });
       }
     });
@@ -396,7 +414,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
                   ],
                 ),
               ),
-              if (isInstructor)
+              if (isInstructor || _enrollmentCubit == null)
                 PortalButton(
                   label: 'Manage Course',
                   variant: PortalButtonVariant.secondary,
@@ -431,7 +449,6 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
                       variant: PortalButtonVariant.secondary,
                       size: PortalButtonSize.sm,
                       icon: Icons.add_circle_outline_rounded,
-                      disabled: course.isFull,
                       onPressed: course.isFull
                           ? null
                           : () => _enrollCourse(context, course),
