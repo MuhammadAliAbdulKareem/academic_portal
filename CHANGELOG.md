@@ -4,6 +4,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.5.0] - 2026-09-05 — Course Management
+
+### Added
+- Domain Layer:
+  - `CourseEntity`, `SyllabusItem`, and `CourseSection` domain entities.
+  - `CourseRepository` abstract contract for querying catalog, searching, filtering, creating, and updating courses.
+- Data Layer:
+  - `CourseModel` and `SyllabusItemModel` with Firestore and JSON serialization / deserialization.
+  - `CourseRemoteDataSource` and `CourseRemoteDataSourceImpl` with pre-seeded demo curriculum and cloud Firestore integration.
+  - `CourseRepositoryImpl` with robust error handling and domain mapping.
+- State Management:
+  - `CoursesCubit` & `CoursesState` (`Initial`, `Loading`, `Loaded`, `Error`) supporting real-time search, department filtering, and course detail caching.
+  - `CourseFormCubit` & `CourseFormState` (`Initial`, `Submitting`, `Success`, `Failure`) for multi-section course creation.
+- Course Presentation & Components:
+  - `CourseCard`: Adaptive card component displaying department tag, term badge, enrolled/capacity pill, credits indicator, instructor avatar, schedule, and view details action.
+  - `CourseListScreen`: Responsive course catalog featuring search bar, quick department filter chips (All, CS, Math, Physics, Engineering), grid view, and instructor course creation launcher.
+  - `CourseCreateScreen`: Multi-section course creation wizard including basic details, department and term selectors, schedule and capacity parameters, and dynamic syllabus module builder with week-by-week topic configuration.
+  - `CourseDetailScreen`: Deep-dive course overview featuring tabs for Syllabus breakdown (accordion cards with topics and duration) and Section Roster with live enrollment statistics and student listing.
+- Navigation Shell & Dashboard Integration:
+  - Routes `RouteConstants.courses` (`/courses`), `RouteConstants.courseCreate` (`/courses/create`), and `RouteConstants.courseDetail` (`/courses/:id`).
+  - Added Courses destination to `PortalNavigationShell` (desktop navigation rail & mobile bottom navigation bar).
+  - Connected quick actions and course management links from `InstructorDashboardScreen` directly to the course catalog and course creation wizard.
+- Quality Assurance:
+  - Comprehensive unit and widget test suite in `test/courses_test.dart` (25 total project tests passing cleanly).
+  - Clean static analysis with 0 issues (`flutter analyze`).
+  - Release web bundle compilation verified (`flutter build web --release`).
+
 ## [v0.4.0] - 2026-09-05 — Instructor Dashboard
 
 ### Added
