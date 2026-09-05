@@ -54,6 +54,12 @@ class PortalNavigationShell extends StatefulWidget {
       route: '/',
     ),
     PortalNavItem(
+      label: 'Dashboard',
+      icon: Icons.dashboard_outlined,
+      selectedIcon: Icons.dashboard_rounded,
+      route: '/instructor-dashboard',
+    ),
+    PortalNavItem(
       label: 'Design System',
       icon: Icons.palette_outlined,
       selectedIcon: Icons.palette_rounded,
@@ -64,12 +70,6 @@ class PortalNavigationShell extends StatefulWidget {
       icon: Icons.menu_book_outlined,
       selectedIcon: Icons.menu_book_rounded,
       route: '/courses',
-    ),
-    PortalNavItem(
-      label: 'Profile',
-      icon: Icons.person_outline_rounded,
-      selectedIcon: Icons.person_rounded,
-      route: '/profile',
     ),
   ];
 
@@ -96,7 +96,13 @@ class _PortalNavigationShellState extends State<PortalNavigationShell> {
 
   void _onItemTapped(int index) {
     setState(() => _currentIndex = index);
-    widget.onDestinationSelected?.call(index);
+    if (widget.onDestinationSelected != null) {
+      widget.onDestinationSelected!(index);
+    } else {
+      if (index >= 0 && index < widget.navItems.length) {
+        context.go(widget.navItems[index].route);
+      }
+    }
   }
 
   @override

@@ -8,6 +8,7 @@ import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/design_system/presentation/screens/design_system_screen.dart';
 import '../../features/foundation/presentation/screens/foundation_screen.dart';
+import '../../features/instructor_dashboard/presentation/screens/instructor_dashboard_screen.dart';
 
 /// Helper to bridge Stream changes to GoRouter's Listenable refresh.
 class GoRouterRefreshStream extends ChangeNotifier {
@@ -88,9 +89,12 @@ class AppRouter {
         GoRoute(
           path: RouteConstants.dashboard,
           name: 'dashboard',
-          builder: (context, state) => const Scaffold(
-            body: Center(child: Text('Instructor/Student Dashboard (Upcoming in v0.4.0)')),
-          ),
+          builder: (context, state) => const InstructorDashboardScreen(),
+        ),
+        GoRoute(
+          path: RouteConstants.instructorDashboard,
+          name: 'instructor-dashboard',
+          builder: (context, state) => const InstructorDashboardScreen(),
         ),
       ],
       errorBuilder: (context, state) => Scaffold(

@@ -8,6 +8,7 @@ class RouteConstants {
   static const String login = '/login';
   static const String register = '/register';
   static const String dashboard = '/dashboard';
+  static const String instructorDashboard = '/instructor-dashboard';
   static const String courses = '/courses';
   static const String notFound = '/404';
 }

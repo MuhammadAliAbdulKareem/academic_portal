@@ -202,15 +202,30 @@ class FoundationScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
-          ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: isDark ? AppColors.darkBackground : AppColors.primary,
-              elevation: 0,
-            ),
-            onPressed: () => context.go(RouteConstants.designSystem),
-            icon: const Icon(Icons.palette_rounded, size: 18),
-            label: const Text('Explore Design System (v0.2.0)'),
+          Wrap(
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.sm,
+            children: [
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: isDark ? AppColors.darkBackground : AppColors.primary,
+                  elevation: 0,
+                ),
+                onPressed: () => context.go(RouteConstants.instructorDashboard),
+                icon: const Icon(Icons.dashboard_rounded, size: 18),
+                label: const Text('Instructor Dashboard (v0.4.0)'),
+              ),
+              OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  side: const BorderSide(color: Colors.white54),
+                ),
+                onPressed: () => context.go(RouteConstants.designSystem),
+                icon: const Icon(Icons.palette_rounded, size: 18),
+                label: const Text('Explore Design System (v0.2.0)'),
+              ),
+            ],
           ),
         ],
       ),

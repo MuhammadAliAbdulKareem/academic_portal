@@ -39,10 +39,12 @@ class _DesignSystemScreenState extends State<DesignSystemScreen> {
     final isDark = theme.brightness == Brightness.dark;
 
     return PortalNavigationShell(
-      selectedIndex: 1,
+      selectedIndex: 2,
       onDestinationSelected: (index) {
         if (index == 0) {
           context.go(RouteConstants.root);
+        } else if (index == 1) {
+          context.go(RouteConstants.instructorDashboard);
         }
       },
       child: SingleChildScrollView(
