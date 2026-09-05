@@ -24,6 +24,9 @@ import '../../features/quizzes/presentation/screens/quiz_detail_screen.dart';
 import '../../features/quizzes/presentation/screens/quiz_exam_screen.dart';
 import '../../features/quizzes/presentation/screens/quiz_builder_screen.dart';
 import '../../features/quizzes/presentation/screens/quiz_analytics_screen.dart';
+import '../../features/communications/presentation/screens/announcements_screen.dart';
+import '../../features/communications/presentation/screens/discussions_screen.dart';
+import '../../features/communications/presentation/screens/discussion_detail_screen.dart';
 
 /// Helper to bridge Stream changes to GoRouter's Listenable refresh.
 class GoRouterRefreshStream extends ChangeNotifier {
@@ -214,6 +217,24 @@ class AppRouter {
           builder: (context, state) {
             final quizId = state.pathParameters['id'] ?? '';
             return QuizAnalyticsScreen(quizId: quizId);
+          },
+        ),
+        GoRoute(
+          path: RouteConstants.announcements,
+          name: 'announcements',
+          builder: (context, state) => const AnnouncementsScreen(),
+        ),
+        GoRoute(
+          path: RouteConstants.discussions,
+          name: 'discussions',
+          builder: (context, state) => const DiscussionsScreen(),
+        ),
+        GoRoute(
+          path: RouteConstants.discussionDetail,
+          name: 'discussion-detail',
+          builder: (context, state) {
+            final threadId = state.pathParameters['id'] ?? '';
+            return DiscussionDetailScreen(threadId: threadId);
           },
         ),
       ],

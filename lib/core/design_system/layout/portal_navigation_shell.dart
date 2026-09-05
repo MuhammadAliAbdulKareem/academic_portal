@@ -12,6 +12,7 @@ import '../../../features/auth/presentation/cubit/auth_cubit.dart';
 import '../../../features/auth/presentation/cubit/auth_state.dart';
 import '../components/portal_avatar.dart';
 import '../components/portal_badge.dart';
+import '../../../features/communications/presentation/widgets/notification_badge_button.dart';
 
 /// Navigation item model representing destination routes.
 class PortalNavItem {
@@ -88,6 +89,18 @@ class PortalNavigationShell extends StatefulWidget {
       icon: Icons.quiz_outlined,
       selectedIcon: Icons.quiz_rounded,
       route: '/quizzes',
+    ),
+    PortalNavItem(
+      label: 'Announcements',
+      icon: Icons.campaign_outlined,
+      selectedIcon: Icons.campaign_rounded,
+      route: '/announcements',
+    ),
+    PortalNavItem(
+      label: 'Discussions',
+      icon: Icons.forum_outlined,
+      selectedIcon: Icons.forum_rounded,
+      route: '/discussions',
     ),
   ];
 
@@ -184,6 +197,7 @@ class _PortalNavigationShellState extends State<PortalNavigationShell> {
             );
           },
         ),
+        const NotificationBadgeButton(),
         if (widget.trailingHeaderAction != null) widget.trailingHeaderAction!,
         const SizedBox(width: AppSpacing.xs),
         BlocBuilder<AuthCubit, AuthState>(

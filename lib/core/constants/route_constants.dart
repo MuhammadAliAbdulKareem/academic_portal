@@ -24,5 +24,8 @@ class RouteConstants {
   static const String quizExam = '/quizzes/:id/take';
   static const String quizBuilder = '/quizzes/create';
   static const String quizAnalytics = '/quizzes/:id/analytics';
+  static const String announcements = '/announcements';
+  static const String discussions = '/discussions';
+  static const String discussionDetail = '/discussions/:id';
   static const String notFound = '/404';
 }

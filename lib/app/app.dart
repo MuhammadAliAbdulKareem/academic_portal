@@ -50,6 +50,13 @@ import '../features/quizzes/presentation/cubit/quiz_builder_cubit.dart';
 import '../features/quizzes/presentation/cubit/quiz_detail_cubit.dart';
 import '../features/quizzes/presentation/cubit/quiz_exam_session_cubit.dart';
 import '../features/quizzes/presentation/cubit/quiz_list_cubit.dart';
+import '../features/communications/data/datasources/communications_remote_data_source.dart';
+import '../features/communications/data/repositories/communications_repository_impl.dart';
+import '../features/communications/domain/repositories/communications_repository.dart';
+import '../features/communications/presentation/cubit/announcements_cubit.dart';
+import '../features/communications/presentation/cubit/discussions_cubit.dart';
+import '../features/communications/presentation/cubit/discussion_detail_cubit.dart';
+import '../features/communications/presentation/cubit/notifications_cubit.dart';
 
 /// Root application widget configuring global providers, router, and reactive theming.
 class AcademicPortalApp extends StatefulWidget {
@@ -60,6 +67,7 @@ class AcademicPortalApp extends StatefulWidget {
   final AssignmentRepository? assignmentRepository;
   final AttendanceRepository? attendanceRepository;
   final QuizRepository? quizRepository;
+  final CommunicationsRepository? communicationsRepository;
 
   const AcademicPortalApp({
     super.key,
@@ -70,6 +78,7 @@ class AcademicPortalApp extends StatefulWidget {
     this.assignmentRepository,
     this.attendanceRepository,
     this.quizRepository,
+    this.communicationsRepository,
   });
 
   @override
@@ -105,6 +114,11 @@ class _AcademicPortalAppState extends State<AcademicPortalApp> {
   late final QuizExamSessionCubit _quizExamSessionCubit;
   late final QuizBuilderCubit _quizBuilderCubit;
   late final QuizAnalyticsCubit _quizAnalyticsCubit;
+  late final CommunicationsRepository _communicationsRepository;
+  late final AnnouncementsCubit _announcementsCubit;
+  late final DiscussionsCubit _discussionsCubit;
+  late final DiscussionDetailCubit _discussionDetailCubit;
+  late final NotificationsCubit _notificationsCubit;
   late final GoRouter _router;
 
   @override
@@ -155,6 +169,11 @@ class _AcademicPortalAppState extends State<AcademicPortalApp> {
           remoteDataSource: QuizRemoteDataSourceImpl(),
         );
 
+    _communicationsRepository = widget.communicationsRepository ??
+        CommunicationsRepositoryImpl(
+          remoteDataSource: CommunicationsRemoteDataSourceImpl(),
+        );
+
     _authCubit = AuthCubit(authRepository: _authRepository);
     _themeCubit = ThemeCubit();
     _coursesCubit = CoursesCubit(repository: _courseRepository);
@@ -179,6 +198,11 @@ class _AcademicPortalAppState extends State<AcademicPortalApp> {
     _quizExamSessionCubit = QuizExamSessionCubit(repository: _quizRepository);
     _quizBuilderCubit = QuizBuilderCubit(repository: _quizRepository);
     _quizAnalyticsCubit = QuizAnalyticsCubit(repository: _quizRepository);
+    _announcementsCubit = AnnouncementsCubit(repository: _communicationsRepository);
+    _discussionsCubit = DiscussionsCubit(repository: _communicationsRepository);
+    _discussionDetailCubit = DiscussionDetailCubit(repository: _communicationsRepository);
+    _notificationsCubit = NotificationsCubit(repository: _communicationsRepository)
+      ..loadNotifications('demo-student-01');
 
     _router = AppRouter.createRouter(_authCubit);
   }
@@ -206,6 +230,10 @@ class _AcademicPortalAppState extends State<AcademicPortalApp> {
     _quizExamSessionCubit.close();
     _quizBuilderCubit.close();
     _quizAnalyticsCubit.close();
+    _announcementsCubit.close();
+    _discussionsCubit.close();
+    _discussionDetailCubit.close();
+    _notificationsCubit.close();
     super.dispose();
   }
 
@@ -216,6 +244,7 @@ class _AcademicPortalAppState extends State<AcademicPortalApp> {
         RepositoryProvider<AssignmentRepository>.value(value: _assignmentRepository),
         RepositoryProvider<AttendanceRepository>.value(value: _attendanceRepository),
         RepositoryProvider<QuizRepository>.value(value: _quizRepository),
+        RepositoryProvider<CommunicationsRepository>.value(value: _communicationsRepository),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -242,6 +271,10 @@ class _AcademicPortalAppState extends State<AcademicPortalApp> {
           BlocProvider<QuizExamSessionCubit>.value(value: _quizExamSessionCubit),
           BlocProvider<QuizBuilderCubit>.value(value: _quizBuilderCubit),
           BlocProvider<QuizAnalyticsCubit>.value(value: _quizAnalyticsCubit),
+          BlocProvider<AnnouncementsCubit>.value(value: _announcementsCubit),
+          BlocProvider<DiscussionsCubit>.value(value: _discussionsCubit),
+          BlocProvider<DiscussionDetailCubit>.value(value: _discussionDetailCubit),
+          BlocProvider<NotificationsCubit>.value(value: _notificationsCubit),
         ],
         child: BlocBuilder<ThemeCubit, ThemeState>(
           builder: (context, themeState) {
