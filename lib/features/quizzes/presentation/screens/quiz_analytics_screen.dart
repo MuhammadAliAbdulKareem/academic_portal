@@ -8,7 +8,6 @@ import '../../../../core/design_system/components/portal_skeleton.dart';
 import '../../../../core/responsive/responsive_layout.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/app_typography.dart';
 import '../cubit/quiz_analytics_cubit.dart';
 import '../cubit/quiz_analytics_state.dart';
 
@@ -55,7 +54,7 @@ class _QuizAnalyticsScreenState extends State<QuizAnalyticsScreen> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.lightBackground,
       appBar: AppBar(
         title: const Text('Assessment Analytics & Roster'),
         elevation: 0,
@@ -68,9 +67,9 @@ class _QuizAnalyticsScreenState extends State<QuizAnalyticsScreen> {
               padding: EdgeInsets.all(AppSpacing.lg),
               child: Column(
                 children: [
-                  PortalSkeleton(height: 100, borderRadius: 16),
+                  PortalSkeleton.card(height: 100),
                   SizedBox(height: AppSpacing.md),
-                  PortalSkeleton(height: 250, borderRadius: 16),
+                  PortalSkeleton.card(height: 250),
                 ],
               ),
             );
@@ -81,7 +80,7 @@ class _QuizAnalyticsScreenState extends State<QuizAnalyticsScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.error_outline, size: 48, color: AppColors.error),
+                  const Icon(Icons.error_outline, size: 48, color: AppColors.error),
                   const SizedBox(height: AppSpacing.md),
                   Text(state.message),
                   const SizedBox(height: AppSpacing.md),
@@ -123,8 +122,9 @@ class _QuizAnalyticsScreenState extends State<QuizAnalyticsScreen> {
                                       const SizedBox(width: AppSpacing.sm),
                                       Text(
                                         quiz.courseTitle,
-                                        style: AppTypography.caption.copyWith(
-                                          color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
                                         ),
                                       ),
                                     ],
@@ -132,16 +132,18 @@ class _QuizAnalyticsScreenState extends State<QuizAnalyticsScreen> {
                                   const SizedBox(height: AppSpacing.sm),
                                   Text(
                                     quiz.title,
-                                    style: AppTypography.headlineSmall.copyWith(
-                                      color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                                    style: TextStyle(
+                                      fontSize: 20,
                                       fontWeight: FontWeight.bold,
+                                      color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
                                     ),
                                   ),
                                   const SizedBox(height: AppSpacing.xs),
                                   Text(
                                     '${quiz.questionsCount} Questions • ${quiz.totalPoints} Points • Pass Mark: ${quiz.passingPercentage.toStringAsFixed(0)}%',
-                                    style: AppTypography.caption.copyWith(
-                                      color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
                                     ),
                                   ),
                                 ],
@@ -151,7 +153,7 @@ class _QuizAnalyticsScreenState extends State<QuizAnalyticsScreen> {
                               label: 'Export CSV',
                               icon: Icons.download_outlined,
                               variant: PortalButtonVariant.secondary,
-                              size: PortalButtonSize.small,
+                              size: PortalButtonSize.sm,
                               onPressed: () => _simulateCsvExport(context, state),
                             ),
                           ],
@@ -192,7 +194,11 @@ class _QuizAnalyticsScreenState extends State<QuizAnalyticsScreen> {
                         children: [
                           Text(
                             'Student Submissions (${state.filteredAttempts.length})',
-                            style: AppTypography.titleMedium.copyWith(fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                            ),
                           ),
                           SizedBox(
                             width: 250,
@@ -222,8 +228,9 @@ class _QuizAnalyticsScreenState extends State<QuizAnalyticsScreen> {
                                 state.searchFilter.isNotEmpty
                                     ? 'No student submissions match "${state.searchFilter}".'
                                     : 'No submissions recorded for this assessment yet.',
-                                style: AppTypography.bodyMedium.copyWith(
-                                  color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
                                 ),
                               ),
                             ),
@@ -239,7 +246,7 @@ class _QuizAnalyticsScreenState extends State<QuizAnalyticsScreen> {
                                   PortalAvatar(
                                     imageUrl: attempt.studentAvatar,
                                     name: attempt.studentName,
-                                    size: PortalAvatarSize.medium,
+                                    size: PortalAvatarSize.md,
                                   ),
                                   const SizedBox(width: AppSpacing.md),
                                   Expanded(
@@ -248,15 +255,17 @@ class _QuizAnalyticsScreenState extends State<QuizAnalyticsScreen> {
                                       children: [
                                         Text(
                                           attempt.studentName,
-                                          style: AppTypography.titleSmall.copyWith(
+                                          style: TextStyle(
+                                            fontSize: 14,
                                             fontWeight: FontWeight.bold,
-                                            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                                            color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
                                           ),
                                         ),
                                         Text(
                                           'ID: ${attempt.studentId} • Taken: ${attempt.timeTakenFormatted}',
-                                          style: AppTypography.caption.copyWith(
-                                            color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
                                           ),
                                         ),
                                       ],
@@ -267,7 +276,8 @@ class _QuizAnalyticsScreenState extends State<QuizAnalyticsScreen> {
                                     children: [
                                       Text(
                                         '${attempt.score} / ${attempt.totalPossiblePoints} (${attempt.percentage.toStringAsFixed(1)}%)',
-                                        style: AppTypography.titleSmall.copyWith(
+                                        style: TextStyle(
+                                          fontSize: 14,
                                           fontWeight: FontWeight.bold,
                                           color: attempt.passed ? AppColors.success : AppColors.error,
                                         ),
@@ -305,10 +315,10 @@ class _QuizAnalyticsScreenState extends State<QuizAnalyticsScreen> {
           Container(
             padding: const EdgeInsets.all(AppSpacing.sm),
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: isDark ? 0.25 : 0.1),
+              color: AppColors.primaryLight.withValues(alpha: isDark ? 0.25 : 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(icon, color: AppColors.primary, size: 24),
+            child: Icon(icon, color: AppColors.primaryLight, size: 24),
           ),
           const SizedBox(width: AppSpacing.md),
           Column(
@@ -316,15 +326,17 @@ class _QuizAnalyticsScreenState extends State<QuizAnalyticsScreen> {
             children: [
               Text(
                 value,
-                style: AppTypography.titleMedium.copyWith(
+                style: TextStyle(
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                  color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
                 ),
               ),
               Text(
                 label,
-                style: AppTypography.caption.copyWith(
-                  color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
                 ),
               ),
             ],

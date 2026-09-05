@@ -5,10 +5,9 @@ import '../../../../core/constants/route_constants.dart';
 import '../../../../core/design_system/components/portal_button.dart';
 import '../../../../core/design_system/components/portal_empty_state.dart';
 import '../../../../core/design_system/components/portal_skeleton.dart';
-import '../../../../core/responsive/responsive_layout.dart';
+import '../../../../core/responsive/responsive_extensions.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/app_typography.dart';
 import '../../../auth/domain/entities/user_entity.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../../auth/presentation/cubit/auth_state.dart';
@@ -36,7 +35,7 @@ class _QuizListScreenState extends State<QuizListScreen> with SingleTickerProvid
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final authState = context.read<AuthCubit>().state;
       String? studentId;
-      if (authState is AuthAuthenticated && authState.user.role == UserRole.student) {
+      if (authState is Authenticated && authState.user.role == UserRole.student) {
         studentId = authState.user.id;
       }
       context.read<QuizListCubit>().loadQuizzes(studentId: studentId);
@@ -72,11 +71,11 @@ class _QuizListScreenState extends State<QuizListScreen> with SingleTickerProvid
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final authState = context.watch<AuthCubit>().state;
-    final isInstructor = authState is AuthAuthenticated &&
-        (authState.user.role == UserRole.instructor || authState.user.role == UserRole.admin);
+    final isInstructor = authState is Authenticated &&
+        authState.user.role == UserRole.instructor;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.lightBackground,
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () => context.read<QuizListCubit>().refresh(),
@@ -100,9 +99,10 @@ class _QuizListScreenState extends State<QuizListScreen> with SingleTickerProvid
                               children: [
                                 Text(
                                   'Quizzes & Exams',
-                                  style: AppTypography.headlineMedium.copyWith(
-                                    color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                                  style: TextStyle(
+                                    fontSize: 24,
                                     fontWeight: FontWeight.bold,
+                                    color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
                                   ),
                                 ),
                                 const SizedBox(height: AppSpacing.xs),
@@ -110,8 +110,9 @@ class _QuizListScreenState extends State<QuizListScreen> with SingleTickerProvid
                                   isInstructor
                                       ? 'Author assessments, manage question banks, and review grade statistics.'
                                       : 'Prepare for upcoming assessments, take timed exams, and review feedback.',
-                                  style: AppTypography.bodyMedium.copyWith(
-                                    color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
                                   ),
                                 ),
                               ],
@@ -147,14 +148,14 @@ class _QuizListScreenState extends State<QuizListScreen> with SingleTickerProvid
                                 )
                               : null,
                           filled: true,
-                          fillColor: isDark ? AppColors.darkSurface : AppColors.surface,
+                          fillColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: isDark ? AppColors.darkBorder : AppColors.border),
+                            borderSide: BorderSide(color: isDark ? AppColors.darkBorder : AppColors.lightBorder),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: isDark ? AppColors.darkBorder : AppColors.border),
+                            borderSide: BorderSide(color: isDark ? AppColors.darkBorder : AppColors.lightBorder),
                           ),
                           contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                         ),
@@ -164,9 +165,9 @@ class _QuizListScreenState extends State<QuizListScreen> with SingleTickerProvid
                       // Filter Tabs
                       TabBar(
                         controller: _tabController,
-                        labelColor: AppColors.primary,
-                        unselectedLabelColor: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
-                        indicatorColor: AppColors.primary,
+                        labelColor: AppColors.primaryLight,
+                        unselectedLabelColor: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                        indicatorColor: AppColors.primaryLight,
                         tabs: const [
                           Tab(text: 'All Quizzes'),
                           Tab(text: 'Active & Upcoming'),
@@ -188,7 +189,7 @@ class _QuizListScreenState extends State<QuizListScreen> with SingleTickerProvid
                         delegate: SliverChildBuilderDelegate(
                           (context, index) => const Padding(
                             padding: EdgeInsets.only(bottom: AppSpacing.md),
-                            child: PortalSkeleton(height: 140, borderRadius: 16),
+                            child: PortalSkeleton.card(height: 140),
                           ),
                           childCount: 3,
                         ),
@@ -202,10 +203,10 @@ class _QuizListScreenState extends State<QuizListScreen> with SingleTickerProvid
                       child: Center(
                         child: PortalEmptyState(
                           title: 'Error loading quizzes',
-                          message: state.message,
+                          description: state.message,
                           icon: Icons.error_outline,
                           actionLabel: 'Retry',
-                          onAction: () => context.read<QuizListCubit>().refresh(),
+                          onActionPressed: () => context.read<QuizListCubit>().refresh(),
                         ),
                       ),
                     );
@@ -218,7 +219,7 @@ class _QuizListScreenState extends State<QuizListScreen> with SingleTickerProvid
                         child: Center(
                           child: PortalEmptyState(
                             title: 'No quizzes found',
-                            message: state.searchQuery.isNotEmpty
+                            description: state.searchQuery.isNotEmpty
                                 ? 'No quizzes match "${state.searchQuery}". Try a different search.'
                                 : 'No quizzes available under this filter category.',
                             icon: Icons.quiz_outlined,
@@ -229,7 +230,7 @@ class _QuizListScreenState extends State<QuizListScreen> with SingleTickerProvid
 
                     return SliverPadding(
                       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
-                      sliver: ResponsiveLayout.isMobile(context)
+                      sliver: context.isMobile
                           ? SliverList(
                               delegate: SliverChildBuilderDelegate(
                                 (context, index) {
@@ -250,7 +251,7 @@ class _QuizListScreenState extends State<QuizListScreen> with SingleTickerProvid
                             )
                           : SliverGrid(
                               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: ResponsiveLayout.isDesktop(context) ? 3 : 2,
+                                crossAxisCount: context.isDesktop ? 3 : 2,
                                 childAspectRatio: 1.25,
                                 crossAxisSpacing: AppSpacing.md,
                                 mainAxisSpacing: AppSpacing.md,

@@ -3,11 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/design_system/components/portal_button.dart';
 import '../../../../core/design_system/components/portal_card.dart';
-import '../../../../core/design_system/components/portal_skeleton.dart';
-import '../../../../core/responsive/responsive_layout.dart';
+import '../../../../core/responsive/responsive_extensions.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/app_typography.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../../auth/presentation/cubit/auth_state.dart';
 import '../cubit/quiz_exam_session_cubit.dart';
@@ -36,10 +34,10 @@ class _QuizExamScreenState extends State<QuizExamScreen> {
       String studentName = 'Demo Student';
       String? avatar;
 
-      if (authState is AuthAuthenticated) {
+      if (authState is Authenticated) {
         studentId = authState.user.id;
-        studentName = authState.user.fullName;
-        avatar = authState.user.avatarUrl;
+        studentName = authState.user.displayName;
+        avatar = authState.user.photoUrl;
       }
 
       context.read<QuizExamSessionCubit>().startSession(
@@ -59,12 +57,13 @@ class _QuizExamScreenState extends State<QuizExamScreen> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          backgroundColor: isDark ? AppColors.darkSurface : AppColors.surface,
+          backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
           title: Text(
             'Submit Examination?',
-            style: AppTypography.titleMedium.copyWith(
-              color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+            style: TextStyle(
+              color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
               fontWeight: FontWeight.bold,
+              fontSize: 18,
             ),
           ),
           content: Column(
@@ -73,8 +72,9 @@ class _QuizExamScreenState extends State<QuizExamScreen> {
             children: [
               Text(
                 'You have answered ${state.answeredCount} of ${state.totalQuestions} questions.',
-                style: AppTypography.bodyMedium.copyWith(
-                  color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                style: TextStyle(
+                  color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                  fontSize: 14,
                 ),
               ),
               if (unanswered > 0) ...[
@@ -88,14 +88,15 @@ class _QuizExamScreenState extends State<QuizExamScreen> {
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.warning_amber_rounded, size: 20, color: AppColors.warning),
+                      const Icon(Icons.warning_amber_rounded, size: 20, color: AppColors.warning),
                       const SizedBox(width: AppSpacing.xs),
                       Expanded(
                         child: Text(
                           '$unanswered question(s) remain unanswered.',
-                          style: AppTypography.caption.copyWith(
+                          style: const TextStyle(
                             color: AppColors.warning,
                             fontWeight: FontWeight.w600,
+                            fontSize: 12,
                           ),
                         ),
                       ),
@@ -106,8 +107,9 @@ class _QuizExamScreenState extends State<QuizExamScreen> {
               const SizedBox(height: AppSpacing.sm),
               Text(
                 'Once submitted, your answers will be finalized and evaluated.',
-                style: AppTypography.bodySmall.copyWith(
-                  color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                style: TextStyle(
+                  color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                  fontSize: 12,
                 ),
               ),
             ],
@@ -120,7 +122,7 @@ class _QuizExamScreenState extends State<QuizExamScreen> {
             PortalButton(
               label: 'Confirm & Submit',
               variant: PortalButtonVariant.primary,
-              size: PortalButtonSize.small,
+              size: PortalButtonSize.sm,
               onPressed: () {
                 Navigator.of(dialogContext).pop();
                 context.read<QuizExamSessionCubit>().submitExam();
@@ -139,7 +141,7 @@ class _QuizExamScreenState extends State<QuizExamScreen> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          backgroundColor: isDark ? AppColors.darkSurface : AppColors.surface,
+          backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
           title: const Text('Leave Active Examination?'),
           content: const Text(
             'Exiting now will submit your examination with your current answers.',
@@ -151,8 +153,8 @@ class _QuizExamScreenState extends State<QuizExamScreen> {
             ),
             PortalButton(
               label: 'Submit & Exit',
-              variant: PortalButtonVariant.error,
-              size: PortalButtonSize.small,
+              variant: PortalButtonVariant.destructive,
+              size: PortalButtonSize.sm,
               onPressed: () {
                 Navigator.of(dialogContext).pop();
                 context.read<QuizExamSessionCubit>().submitExam();
@@ -169,7 +171,7 @@ class _QuizExamScreenState extends State<QuizExamScreen> {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: isDark ? AppColors.darkSurface : AppColors.surface,
+      backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -195,7 +197,7 @@ class _QuizExamScreenState extends State<QuizExamScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final isDesktop = ResponsiveLayout.isDesktop(context);
+    final isDesktop = context.isDesktop;
 
     return PopScope(
       canPop: false,
@@ -209,7 +211,7 @@ class _QuizExamScreenState extends State<QuizExamScreen> {
         }
       },
       child: Scaffold(
-        backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+        backgroundColor: isDark ? AppColors.darkBackground : AppColors.lightBackground,
         body: SafeArea(
           child: BlocConsumer<QuizExamSessionCubit, QuizExamSessionState>(
             listener: (context, state) {
@@ -278,9 +280,9 @@ class _QuizExamScreenState extends State<QuizExamScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
                       decoration: BoxDecoration(
-                        color: isDark ? AppColors.darkSurface : AppColors.surface,
+                        color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
                         border: Border(
-                          bottom: BorderSide(color: isDark ? AppColors.darkBorder : AppColors.border),
+                          bottom: BorderSide(color: isDark ? AppColors.darkBorder : AppColors.lightBorder),
                         ),
                       ),
                       child: Row(
@@ -297,17 +299,19 @@ class _QuizExamScreenState extends State<QuizExamScreen> {
                               children: [
                                 Text(
                                   state.quiz.title,
-                                  style: AppTypography.titleSmall.copyWith(
-                                    color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                                  style: TextStyle(
+                                    fontSize: 15,
                                     fontWeight: FontWeight.bold,
+                                    color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
                                 Text(
                                   'Question ${state.currentQuestionIndex + 1} of ${state.totalQuestions} • ${state.answeredCount} answered',
-                                  style: AppTypography.caption.copyWith(
-                                    color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
                                   ),
                                 ),
                               ],
@@ -333,8 +337,8 @@ class _QuizExamScreenState extends State<QuizExamScreen> {
                     // Progress Bar
                     LinearProgressIndicator(
                       value: state.progressPercentage,
-                      backgroundColor: isDark ? AppColors.darkBorder : AppColors.border,
-                      valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
+                      backgroundColor: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                      valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primaryLight),
                       minHeight: 3,
                     ),
 
@@ -391,9 +395,9 @@ class _QuizExamScreenState extends State<QuizExamScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
                       decoration: BoxDecoration(
-                        color: isDark ? AppColors.darkSurface : AppColors.surface,
+                        color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
                         border: Border(
-                          top: BorderSide(color: isDark ? AppColors.darkBorder : AppColors.border),
+                          top: BorderSide(color: isDark ? AppColors.darkBorder : AppColors.lightBorder),
                         ),
                       ),
                       child: Row(
@@ -404,7 +408,7 @@ class _QuizExamScreenState extends State<QuizExamScreen> {
                             label: 'Previous',
                             icon: Icons.chevron_left,
                             variant: PortalButtonVariant.secondary,
-                            size: PortalButtonSize.medium,
+                            size: PortalButtonSize.md,
                             onPressed: state.isFirstQuestion ? null : () => cubit.previousQuestion(),
                           ),
 
@@ -413,7 +417,7 @@ class _QuizExamScreenState extends State<QuizExamScreen> {
                             label: isFlagged ? 'Flagged' : 'Flag for Review',
                             icon: isFlagged ? Icons.flag : Icons.outlined_flag,
                             variant: isFlagged ? PortalButtonVariant.secondary : PortalButtonVariant.ghost,
-                            size: PortalButtonSize.medium,
+                            size: PortalButtonSize.md,
                             onPressed: () => cubit.toggleFlagQuestion(q.id),
                           ),
 
@@ -423,7 +427,7 @@ class _QuizExamScreenState extends State<QuizExamScreen> {
                               label: 'Submit Exam',
                               icon: Icons.check_circle_outline,
                               variant: PortalButtonVariant.primary,
-                              size: PortalButtonSize.medium,
+                              size: PortalButtonSize.md,
                               onPressed: () => _showSubmitConfirmation(context, state),
                             )
                           else
@@ -431,7 +435,7 @@ class _QuizExamScreenState extends State<QuizExamScreen> {
                               label: 'Next',
                               icon: Icons.chevron_right,
                               variant: PortalButtonVariant.primary,
-                              size: PortalButtonSize.medium,
+                              size: PortalButtonSize.md,
                               onPressed: () => cubit.nextQuestion(),
                             ),
                         ],

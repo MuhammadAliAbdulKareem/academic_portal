@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/quiz_entity.dart';
 
 class QuestionPaletteWidget extends StatelessWidget {
@@ -34,15 +33,17 @@ class QuestionPaletteWidget extends StatelessWidget {
           children: [
             Text(
               'Question Palette',
-              style: AppTypography.titleSmall.copyWith(
-                color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+              style: TextStyle(
+                color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
                 fontWeight: FontWeight.bold,
+                fontSize: 14,
               ),
             ),
             Text(
               '${answers.length} of ${questions.length} answered',
-              style: AppTypography.caption.copyWith(
-                color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+              style: TextStyle(
+                color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                fontSize: 12,
               ),
             ),
           ],
@@ -65,7 +66,7 @@ class QuestionPaletteWidget extends StatelessWidget {
               isDark: isDark,
             ),
             _buildLegendItem(
-              color: isDark ? AppColors.darkBorder : AppColors.border,
+              color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
               label: 'Unanswered',
               isDark: isDark,
             ),
@@ -90,7 +91,7 @@ class QuestionPaletteWidget extends StatelessWidget {
             if (isCurrent) {
               bgColor = AppColors.primary;
               textColor = Colors.white;
-              border = Border.all(color: AppColors.primary, width: 2);
+              border = Border.all(color: AppColors.primaryLight, width: 2);
             } else if (isFlagged) {
               bgColor = AppColors.warning.withValues(alpha: isDark ? 0.3 : 0.15);
               textColor = AppColors.warning;
@@ -100,9 +101,9 @@ class QuestionPaletteWidget extends StatelessWidget {
               textColor = AppColors.success;
               border = Border.all(color: AppColors.success, width: 1.5);
             } else {
-              bgColor = isDark ? AppColors.darkSurface : AppColors.surface;
-              textColor = isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
-              border = Border.all(color: isDark ? AppColors.darkBorder : AppColors.border);
+              bgColor = isDark ? AppColors.darkSurface : AppColors.lightSurface;
+              textColor = isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+              border = Border.all(color: isDark ? AppColors.darkBorder : AppColors.lightBorder);
             }
 
             return InkWell(
@@ -121,13 +122,14 @@ class QuestionPaletteWidget extends StatelessWidget {
                   children: [
                     Text(
                       '${index + 1}',
-                      style: AppTypography.labelMedium.copyWith(
+                      style: TextStyle(
                         color: textColor,
                         fontWeight: isCurrent ? FontWeight.bold : FontWeight.w600,
+                        fontSize: 13,
                       ),
                     ),
                     if (isFlagged && !isCurrent)
-                      Positioned(
+                      const Positioned(
                         top: 2,
                         right: 2,
                         child: Icon(
@@ -165,8 +167,9 @@ class QuestionPaletteWidget extends StatelessWidget {
         const SizedBox(width: 4),
         Text(
           label,
-          style: AppTypography.caption.copyWith(
-            color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+          style: TextStyle(
+            color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+            fontSize: 12,
           ),
         ),
       ],

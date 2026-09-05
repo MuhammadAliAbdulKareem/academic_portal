@@ -42,6 +42,14 @@ import '../features/attendance/presentation/cubit/attendance_roster_cubit.dart';
 import '../features/attendance/presentation/cubit/attendance_session_cubit.dart';
 import '../features/attendance/presentation/cubit/student_attendance_history_cubit.dart';
 import '../features/attendance/presentation/cubit/student_check_in_cubit.dart';
+import '../features/quizzes/data/datasources/quiz_remote_data_source.dart';
+import '../features/quizzes/data/repositories/quiz_repository_impl.dart';
+import '../features/quizzes/domain/repositories/quiz_repository.dart';
+import '../features/quizzes/presentation/cubit/quiz_analytics_cubit.dart';
+import '../features/quizzes/presentation/cubit/quiz_builder_cubit.dart';
+import '../features/quizzes/presentation/cubit/quiz_detail_cubit.dart';
+import '../features/quizzes/presentation/cubit/quiz_exam_session_cubit.dart';
+import '../features/quizzes/presentation/cubit/quiz_list_cubit.dart';
 
 /// Root application widget configuring global providers, router, and reactive theming.
 class AcademicPortalApp extends StatefulWidget {
@@ -51,6 +59,7 @@ class AcademicPortalApp extends StatefulWidget {
   final EnrollmentRepository? enrollmentRepository;
   final AssignmentRepository? assignmentRepository;
   final AttendanceRepository? attendanceRepository;
+  final QuizRepository? quizRepository;
 
   const AcademicPortalApp({
     super.key,
@@ -60,6 +69,7 @@ class AcademicPortalApp extends StatefulWidget {
     this.enrollmentRepository,
     this.assignmentRepository,
     this.attendanceRepository,
+    this.quizRepository,
   });
 
   @override
@@ -89,6 +99,12 @@ class _AcademicPortalAppState extends State<AcademicPortalApp> {
   late final AttendanceRosterCubit _attendanceRosterCubit;
   late final StudentCheckInCubit _studentCheckInCubit;
   late final StudentAttendanceHistoryCubit _studentAttendanceHistoryCubit;
+  late final QuizRepository _quizRepository;
+  late final QuizListCubit _quizListCubit;
+  late final QuizDetailCubit _quizDetailCubit;
+  late final QuizExamSessionCubit _quizExamSessionCubit;
+  late final QuizBuilderCubit _quizBuilderCubit;
+  late final QuizAnalyticsCubit _quizAnalyticsCubit;
   late final GoRouter _router;
 
   @override
@@ -134,6 +150,11 @@ class _AcademicPortalAppState extends State<AcademicPortalApp> {
               AttendanceRemoteDataSourceImpl(firestore: firestore),
         );
 
+    _quizRepository = widget.quizRepository ??
+        QuizRepositoryImpl(
+          remoteDataSource: QuizRemoteDataSourceImpl(),
+        );
+
     _authCubit = AuthCubit(authRepository: _authRepository);
     _themeCubit = ThemeCubit();
     _coursesCubit = CoursesCubit(repository: _courseRepository);
@@ -153,6 +174,11 @@ class _AcademicPortalAppState extends State<AcademicPortalApp> {
     _studentCheckInCubit = StudentCheckInCubit(repository: _attendanceRepository);
     _studentAttendanceHistoryCubit =
         StudentAttendanceHistoryCubit(repository: _attendanceRepository);
+    _quizListCubit = QuizListCubit(repository: _quizRepository);
+    _quizDetailCubit = QuizDetailCubit(repository: _quizRepository);
+    _quizExamSessionCubit = QuizExamSessionCubit(repository: _quizRepository);
+    _quizBuilderCubit = QuizBuilderCubit(repository: _quizRepository);
+    _quizAnalyticsCubit = QuizAnalyticsCubit(repository: _quizRepository);
 
     _router = AppRouter.createRouter(_authCubit);
   }
@@ -175,6 +201,11 @@ class _AcademicPortalAppState extends State<AcademicPortalApp> {
     _attendanceRosterCubit.close();
     _studentCheckInCubit.close();
     _studentAttendanceHistoryCubit.close();
+    _quizListCubit.close();
+    _quizDetailCubit.close();
+    _quizExamSessionCubit.close();
+    _quizBuilderCubit.close();
+    _quizAnalyticsCubit.close();
     super.dispose();
   }
 
@@ -184,6 +215,7 @@ class _AcademicPortalAppState extends State<AcademicPortalApp> {
       providers: [
         RepositoryProvider<AssignmentRepository>.value(value: _assignmentRepository),
         RepositoryProvider<AttendanceRepository>.value(value: _attendanceRepository),
+        RepositoryProvider<QuizRepository>.value(value: _quizRepository),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -205,6 +237,11 @@ class _AcademicPortalAppState extends State<AcademicPortalApp> {
           BlocProvider<StudentCheckInCubit>.value(value: _studentCheckInCubit),
           BlocProvider<StudentAttendanceHistoryCubit>.value(
               value: _studentAttendanceHistoryCubit),
+          BlocProvider<QuizListCubit>.value(value: _quizListCubit),
+          BlocProvider<QuizDetailCubit>.value(value: _quizDetailCubit),
+          BlocProvider<QuizExamSessionCubit>.value(value: _quizExamSessionCubit),
+          BlocProvider<QuizBuilderCubit>.value(value: _quizBuilderCubit),
+          BlocProvider<QuizAnalyticsCubit>.value(value: _quizAnalyticsCubit),
         ],
         child: BlocBuilder<ThemeCubit, ThemeState>(
           builder: (context, themeState) {

@@ -7,7 +7,6 @@ import '../../../../core/design_system/components/portal_card.dart';
 import '../../../../core/design_system/components/portal_skeleton.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/app_typography.dart';
 import '../../../auth/domain/entities/user_entity.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../../auth/presentation/cubit/auth_state.dart';
@@ -30,7 +29,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final authState = context.read<AuthCubit>().state;
       String? studentId;
-      if (authState is AuthAuthenticated && authState.user.role == UserRole.student) {
+      if (authState is Authenticated && authState.user.role == UserRole.student) {
         studentId = authState.user.id;
       }
       context.read<QuizDetailCubit>().loadQuizDetail(widget.quizId, studentId: studentId);
@@ -42,11 +41,11 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final authState = context.watch<AuthCubit>().state;
-    final isInstructor = authState is AuthAuthenticated &&
-        (authState.user.role == UserRole.instructor || authState.user.role == UserRole.admin);
+    final isInstructor = authState is Authenticated &&
+        authState.user.role == UserRole.instructor;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.lightBackground,
       appBar: AppBar(
         title: const Text('Quiz Details'),
         elevation: 0,
@@ -59,9 +58,9 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
               padding: EdgeInsets.all(AppSpacing.lg),
               child: Column(
                 children: [
-                  PortalSkeleton(height: 120, borderRadius: 16),
+                  PortalSkeleton.card(height: 120),
                   SizedBox(height: AppSpacing.md),
-                  PortalSkeleton(height: 200, borderRadius: 16),
+                  PortalSkeleton.card(height: 200),
                 ],
               ),
             );
@@ -72,14 +71,14 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.error_outline, size: 48, color: AppColors.error),
+                  const Icon(Icons.error_outline, size: 48, color: AppColors.error),
                   const SizedBox(height: AppSpacing.md),
-                  Text(state.message, style: AppTypography.bodyMedium),
+                  Text(state.message, style: const TextStyle(fontSize: 14)),
                   const SizedBox(height: AppSpacing.md),
                   PortalButton(
                     label: 'Retry',
                     onPressed: () {
-                      final sId = authState is AuthAuthenticated ? authState.user.id : null;
+                      final sId = authState is Authenticated ? authState.user.id : null;
                       context.read<QuizDetailCubit>().loadQuizDetail(widget.quizId, studentId: sId);
                     },
                   ),
@@ -117,8 +116,9 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
                                 Expanded(
                                   child: Text(
                                     quiz.courseTitle,
-                                    style: AppTypography.caption.copyWith(
-                                      color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
                                     ),
                                   ),
                                 ),
@@ -143,18 +143,20 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
 
                             Text(
                               quiz.title,
-                              style: AppTypography.headlineSmall.copyWith(
-                                color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                              style: TextStyle(
+                                fontSize: 20,
                                 fontWeight: FontWeight.bold,
+                                color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
                               ),
                             ),
                             const SizedBox(height: AppSpacing.sm),
 
                             Text(
                               quiz.description,
-                              style: AppTypography.bodyMedium.copyWith(
-                                color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                              style: TextStyle(
+                                fontSize: 14,
                                 height: 1.5,
+                                color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
                               ),
                             ),
                             const SizedBox(height: AppSpacing.lg),
@@ -163,9 +165,9 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
                             Container(
                               padding: const EdgeInsets.all(AppSpacing.md),
                               decoration: BoxDecoration(
-                                color: isDark ? AppColors.darkSurface : AppColors.surface,
+                                color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
+                                border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.lightBorder),
                               ),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -215,9 +217,10 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
                           children: [
                             Text(
                               'Examination Instructions & Policies',
-                              style: AppTypography.titleSmall.copyWith(
-                                color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                              style: TextStyle(
+                                fontSize: 15,
                                 fontWeight: FontWeight.bold,
+                                color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
                               ),
                             ),
                             const SizedBox(height: AppSpacing.sm),
@@ -250,9 +253,10 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
                             children: [
                               Text(
                                 'Previous Attempts (${state.studentAttempts.length})',
-                                style: AppTypography.titleSmall.copyWith(
-                                  color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                                style: TextStyle(
+                                  fontSize: 15,
                                   fontWeight: FontWeight.bold,
+                                  color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
                                 ),
                               ),
                               const SizedBox(height: AppSpacing.md),
@@ -261,7 +265,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
                                   margin: const EdgeInsets.only(bottom: AppSpacing.sm),
                                   padding: const EdgeInsets.all(AppSpacing.md),
                                   decoration: BoxDecoration(
-                                    color: isDark ? AppColors.darkSurface : AppColors.surface,
+                                    color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
                                     borderRadius: BorderRadius.circular(10),
                                     border: Border.all(
                                       color: attempt.passed
@@ -282,15 +286,17 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
                                           children: [
                                             Text(
                                               'Score: ${attempt.score} / ${attempt.totalPossiblePoints} (${attempt.percentage.toStringAsFixed(1)}%)',
-                                              style: AppTypography.bodyMedium.copyWith(
+                                              style: TextStyle(
+                                                fontSize: 14,
                                                 fontWeight: FontWeight.bold,
-                                                color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                                                color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
                                               ),
                                             ),
                                             Text(
                                               'Time taken: ${attempt.timeTakenFormatted}',
-                                              style: AppTypography.caption.copyWith(
-                                                color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
                                               ),
                                             ),
                                           ],
@@ -316,7 +322,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
                           label: 'View Class Analytics & Roster',
                           icon: Icons.insights,
                           variant: PortalButtonVariant.primary,
-                          size: PortalButtonSize.large,
+                          size: PortalButtonSize.lg,
                           onPressed: () => context.push('/quizzes/${quiz.id}/analytics'),
                         )
                       else if (state.canTakeQuiz)
@@ -324,29 +330,33 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
                           label: state.studentAttempts.isEmpty ? 'Start Examination' : 'Retake Examination',
                           icon: Icons.play_arrow_rounded,
                           variant: PortalButtonVariant.primary,
-                          size: PortalButtonSize.large,
+                          size: PortalButtonSize.lg,
                           onPressed: () => context.push('/quizzes/${quiz.id}/take'),
                         )
                       else
                         Container(
                           padding: const EdgeInsets.all(AppSpacing.md),
                           decoration: BoxDecoration(
-                            color: isDark ? AppColors.darkSurface : AppColors.surface,
+                            color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
+                            border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.lightBorder),
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.lock_outline, color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary),
+                              Icon(
+                                Icons.lock_outline,
+                                color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                              ),
                               const SizedBox(width: AppSpacing.sm),
                               Text(
                                 state.attemptsRemaining <= 0
                                     ? 'No attempts remaining (${quiz.maxAttempts}/${quiz.maxAttempts} used)'
                                     : 'This quiz is not currently open for submission.',
-                                style: AppTypography.bodyMedium.copyWith(
-                                  color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                                style: TextStyle(
+                                  fontSize: 14,
                                   fontWeight: FontWeight.w500,
+                                  color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
                                 ),
                               ),
                             ],
@@ -373,19 +383,21 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
   }) {
     return Column(
       children: [
-        Icon(icon, size: 20, color: AppColors.primary),
+        Icon(icon, size: 20, color: AppColors.primaryLight),
         const SizedBox(height: 4),
         Text(
           value,
-          style: AppTypography.titleSmall.copyWith(
+          style: TextStyle(
+            fontSize: 14,
             fontWeight: FontWeight.bold,
-            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+            color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
           ),
         ),
         Text(
           label,
-          style: AppTypography.caption.copyWith(
-            color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+          style: TextStyle(
+            fontSize: 11,
+            color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
           ),
         ),
       ],
@@ -398,12 +410,13 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('• ', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+          const Text('• ', style: TextStyle(color: AppColors.primaryLight, fontWeight: FontWeight.bold)),
           Expanded(
             child: Text(
               text,
-              style: AppTypography.bodySmall.copyWith(
-                color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+              style: TextStyle(
+                fontSize: 13,
+                color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
               ),
             ),
           ),

@@ -6,7 +6,6 @@ import '../../../../core/design_system/components/portal_button.dart';
 import '../../../../core/design_system/components/portal_card.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/quiz_entity.dart';
 import '../cubit/quiz_builder_cubit.dart';
 import '../cubit/quiz_builder_state.dart';
@@ -76,10 +75,14 @@ class _QuizBuilderScreenState extends State<QuizBuilderScreen> {
             final isDark = Theme.of(context).brightness == Brightness.dark;
 
             return AlertDialog(
-              backgroundColor: isDark ? AppColors.darkSurface : AppColors.surface,
+              backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
               title: Text(
                 'Add Question to Assessment',
-                style: AppTypography.titleMedium.copyWith(fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                ),
               ),
               content: SizedBox(
                 width: 500,
@@ -90,7 +93,7 @@ class _QuizBuilderScreenState extends State<QuizBuilderScreen> {
                     children: [
                       // Question Type Dropdown
                       DropdownButtonFormField<QuestionType>(
-                        value: selectedType,
+                        initialValue: selectedType,
                         decoration: const InputDecoration(labelText: 'Question Type'),
                         items: QuestionType.values.map((t) {
                           return DropdownMenuItem(
@@ -127,20 +130,31 @@ class _QuizBuilderScreenState extends State<QuizBuilderScreen> {
 
                       // Specific inputs based on type
                       if (selectedType == QuestionType.singleChoice) ...[
-                        Text('Answer Choices (Select radio for correct answer):', style: AppTypography.labelSmall),
+                        Text(
+                          'Answer Choices (Select radio for correct answer):',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                          ),
+                        ),
                         const SizedBox(height: AppSpacing.xs),
                         ...List.generate(4, (i) {
                           final controllers = [opt1, opt2, opt3, opt4];
                           return Row(
                             children: [
-                              Radio<int>(
-                                value: i,
-                                groupValue: singleCorrect,
-                                onChanged: (val) {
-                                  if (val != null) {
-                                    setDialogState(() => singleCorrect = val);
-                                  }
-                                },
+                              InkWell(
+                                onTap: () => setDialogState(() => singleCorrect = i),
+                                borderRadius: BorderRadius.circular(16),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Icon(
+                                    singleCorrect == i ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+                                    color: singleCorrect == i
+                                        ? AppColors.primaryLight
+                                        : (isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary),
+                                    size: 20,
+                                  ),
+                                ),
                               ),
                               Expanded(
                                 child: TextField(
@@ -152,7 +166,13 @@ class _QuizBuilderScreenState extends State<QuizBuilderScreen> {
                           );
                         }),
                       ] else if (selectedType == QuestionType.trueFalse) ...[
-                        Text('Correct Answer:', style: AppTypography.labelSmall),
+                        Text(
+                          'Correct Answer:',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                          ),
+                        ),
                         const SizedBox(height: AppSpacing.xs),
                         Row(
                           children: [
@@ -201,7 +221,7 @@ class _QuizBuilderScreenState extends State<QuizBuilderScreen> {
                 PortalButton(
                   label: 'Add Question',
                   variant: PortalButtonVariant.primary,
-                  size: PortalButtonSize.small,
+                  size: PortalButtonSize.sm,
                   onPressed: () {
                     final prompt = promptController.text.trim();
                     if (prompt.isEmpty) return;
@@ -253,7 +273,7 @@ class _QuizBuilderScreenState extends State<QuizBuilderScreen> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.lightBackground,
       appBar: AppBar(
         title: const Text('Create New Assessment'),
         elevation: 0,
@@ -301,13 +321,17 @@ class _QuizBuilderScreenState extends State<QuizBuilderScreen> {
                         children: [
                           Text(
                             'General Information',
-                            style: AppTypography.titleMedium.copyWith(fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                            ),
                           ),
                           const SizedBox(height: AppSpacing.md),
 
                           // Course Selector Dropdown
                           DropdownButtonFormField<String>(
-                            value: state.courseId,
+                            initialValue: state.courseId,
                             decoration: const InputDecoration(labelText: 'Target Course'),
                             items: _demoCourses.map((c) {
                               return DropdownMenuItem(
@@ -356,7 +380,7 @@ class _QuizBuilderScreenState extends State<QuizBuilderScreen> {
                             children: [
                               Expanded(
                                 child: TextFormField(
-                                  initialValue: '${state.timeLimitMinutes}',
+                                  initialValue: state.timeLimitMinutes.toString(),
                                   keyboardType: TextInputType.number,
                                   decoration: const InputDecoration(labelText: 'Time Limit (Mins)'),
                                   onChanged: (val) {
@@ -368,7 +392,7 @@ class _QuizBuilderScreenState extends State<QuizBuilderScreen> {
                               const SizedBox(width: AppSpacing.md),
                               Expanded(
                                 child: TextFormField(
-                                  initialValue: '${state.passingPercentage.toStringAsFixed(0)}',
+                                  initialValue: state.passingPercentage.toStringAsFixed(0),
                                   keyboardType: TextInputType.number,
                                   decoration: const InputDecoration(labelText: 'Passing Mark (%)'),
                                   onChanged: (val) {
@@ -380,7 +404,7 @@ class _QuizBuilderScreenState extends State<QuizBuilderScreen> {
                               const SizedBox(width: AppSpacing.md),
                               Expanded(
                                 child: TextFormField(
-                                  initialValue: '${state.maxAttempts}',
+                                  initialValue: state.maxAttempts.toString(),
                                   keyboardType: TextInputType.number,
                                   decoration: const InputDecoration(labelText: 'Max Attempts'),
                                   onChanged: (val) {
@@ -425,7 +449,11 @@ class _QuizBuilderScreenState extends State<QuizBuilderScreen> {
                           children: [
                             Text(
                               'Question Bank (${state.questions.length})',
-                              style: AppTypography.titleMedium.copyWith(fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                              ),
                             ),
                             const SizedBox(width: AppSpacing.sm),
                             PortalBadge(
@@ -438,7 +466,7 @@ class _QuizBuilderScreenState extends State<QuizBuilderScreen> {
                           label: 'Add Question',
                           icon: Icons.add,
                           variant: PortalButtonVariant.secondary,
-                          size: PortalButtonSize.small,
+                          size: PortalButtonSize.sm,
                           onPressed: () => _showAddQuestionDialog(context),
                         ),
                       ],
@@ -453,16 +481,26 @@ class _QuizBuilderScreenState extends State<QuizBuilderScreen> {
                             padding: const EdgeInsets.all(AppSpacing.xl),
                             child: Column(
                               children: [
-                                Icon(Icons.help_outline, size: 48, color: AppColors.textSecondary),
+                                Icon(
+                                  Icons.help_outline,
+                                  size: 48,
+                                  color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                                ),
                                 const SizedBox(height: AppSpacing.sm),
                                 Text(
                                   'No questions added yet.',
-                                  style: AppTypography.bodyMedium,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                                  ),
                                 ),
                                 const SizedBox(height: AppSpacing.xs),
                                 Text(
                                   'Click "Add Question" above to populate the assessment bank.',
-                                  style: AppTypography.caption.copyWith(color: AppColors.textSecondary),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                                  ),
                                 ),
                               ],
                             ),
@@ -480,11 +518,12 @@ class _QuizBuilderScreenState extends State<QuizBuilderScreen> {
                               children: [
                                 CircleAvatar(
                                   radius: 14,
-                                  backgroundColor: AppColors.primary.withValues(alpha: 0.15),
+                                  backgroundColor: AppColors.primaryLight.withValues(alpha: 0.15),
                                   child: Text(
                                     '${index + 1}',
-                                    style: AppTypography.labelSmall.copyWith(
-                                      color: AppColors.primary,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: AppColors.primaryLight,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -510,7 +549,11 @@ class _QuizBuilderScreenState extends State<QuizBuilderScreen> {
                                       const SizedBox(height: AppSpacing.xs),
                                       Text(
                                         q.prompt,
-                                        style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -533,7 +576,7 @@ class _QuizBuilderScreenState extends State<QuizBuilderScreen> {
                       label: state.isSaving ? 'Publishing Assessment...' : 'Publish Assessment',
                       icon: Icons.cloud_upload_outlined,
                       variant: PortalButtonVariant.primary,
-                      size: PortalButtonSize.large,
+                      size: PortalButtonSize.lg,
                       onPressed: state.isSaving ? null : () => cubit.saveQuiz(),
                     ),
                     const SizedBox(height: AppSpacing.xxl),

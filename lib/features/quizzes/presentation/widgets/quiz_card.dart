@@ -4,7 +4,6 @@ import '../../../../core/design_system/components/portal_button.dart';
 import '../../../../core/design_system/components/portal_card.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/quiz_entity.dart';
 
 class QuizCard extends StatelessWidget {
@@ -48,8 +47,9 @@ class QuizCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   quiz.courseTitle,
-                  style: AppTypography.caption.copyWith(
-                    color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -59,7 +59,7 @@ class QuizCard extends StatelessWidget {
               if (!quiz.isPublished)
                 const PortalBadge(
                   label: 'Draft',
-                  variant: PortalBadgeVariant.secondary,
+                  variant: PortalBadgeVariant.neutral,
                 )
               else if (isPast)
                 const PortalBadge(
@@ -83,9 +83,10 @@ class QuizCard extends StatelessWidget {
           // Title
           Text(
             quiz.title,
-            style: AppTypography.titleMedium.copyWith(
-              color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+            style: TextStyle(
+              fontSize: 15,
               fontWeight: FontWeight.bold,
+              color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
             ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
@@ -95,8 +96,9 @@ class QuizCard extends StatelessWidget {
           // Description
           Text(
             quiz.description,
-            style: AppTypography.bodySmall.copyWith(
-              color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+            style: TextStyle(
+              fontSize: 13,
+              color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
             ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
@@ -145,13 +147,14 @@ class QuizCard extends StatelessWidget {
                   Icon(
                     Icons.event_outlined,
                     size: 16,
-                    color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                    color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
                   ),
                   const SizedBox(width: AppSpacing.xs),
                   Text(
                     'Due ${quiz.dueDate.day}/${quiz.dueDate.month}/${quiz.dueDate.year}',
-                    style: AppTypography.caption.copyWith(
-                      color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
                     ),
                   ),
                 ],
@@ -162,7 +165,7 @@ class QuizCard extends StatelessWidget {
                 PortalButton(
                   label: 'Analytics',
                   icon: Icons.insights,
-                  size: PortalButtonSize.small,
+                  size: PortalButtonSize.sm,
                   variant: PortalButtonVariant.secondary,
                   onPressed: onAnalytics,
                 )
@@ -170,14 +173,14 @@ class QuizCard extends StatelessWidget {
                 PortalButton(
                   label: 'Start Quiz',
                   icon: Icons.play_arrow_rounded,
-                  size: PortalButtonSize.small,
+                  size: PortalButtonSize.sm,
                   variant: PortalButtonVariant.primary,
                   onPressed: onTakeQuiz,
                 )
               else
                 PortalButton(
                   label: 'View Details',
-                  size: PortalButtonSize.small,
+                  size: PortalButtonSize.sm,
                   variant: PortalButtonVariant.ghost,
                   onPressed: onTap,
                 ),
@@ -199,14 +202,15 @@ class QuizCard extends StatelessWidget {
         Icon(
           icon,
           size: 14,
-          color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+          color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
         ),
         const SizedBox(width: 4),
         Text(
           label,
-          style: AppTypography.caption.copyWith(
-            color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+          style: TextStyle(
+            fontSize: 12,
             fontWeight: FontWeight.w500,
+            color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
           ),
         ),
       ],

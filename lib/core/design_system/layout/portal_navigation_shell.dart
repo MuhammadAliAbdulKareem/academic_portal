@@ -83,6 +83,12 @@ class PortalNavigationShell extends StatefulWidget {
       selectedIcon: Icons.qr_code_scanner_rounded,
       route: '/attendance',
     ),
+    PortalNavItem(
+      label: 'Quizzes',
+      icon: Icons.quiz_outlined,
+      selectedIcon: Icons.quiz_rounded,
+      route: '/quizzes',
+    ),
   ];
 
   @override

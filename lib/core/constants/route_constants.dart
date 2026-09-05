@@ -19,5 +19,10 @@ class RouteConstants {
   static const String gradebook = '/courses/:id/gradebook';
   static const String attendance = '/attendance';
   static const String attendanceSessionDetail = '/attendance/session/:id';
+  static const String quizzes = '/quizzes';
+  static const String quizDetail = '/quizzes/:id';
+  static const String quizExam = '/quizzes/:id/take';
+  static const String quizBuilder = '/quizzes/create';
+  static const String quizAnalytics = '/quizzes/:id/analytics';
   static const String notFound = '/404';
 }

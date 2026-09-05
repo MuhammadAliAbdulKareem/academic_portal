@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/app_typography.dart';
 
 class ExamTimerWidget extends StatelessWidget {
   final int remainingSeconds;
@@ -22,22 +21,27 @@ class ExamTimerWidget extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
         decoration: BoxDecoration(
-          color: isDark ? AppColors.darkSurface : AppColors.surface,
+          color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isDark ? AppColors.darkBorder : AppColors.border,
+            color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
           ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.all_inclusive, size: 16, color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary),
+            Icon(
+              Icons.all_inclusive,
+              size: 16,
+              color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+            ),
             const SizedBox(width: AppSpacing.xs),
             Text(
               'Untimed',
-              style: AppTypography.labelMedium.copyWith(
-                color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+              style: TextStyle(
+                color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
                 fontWeight: FontWeight.bold,
+                fontSize: 13,
               ),
             ),
           ],
@@ -93,9 +97,10 @@ class ExamTimerWidget extends StatelessWidget {
           const SizedBox(width: AppSpacing.sm),
           Text(
             formatted,
-            style: AppTypography.titleSmall.copyWith(
+            style: TextStyle(
               color: timerColor,
               fontWeight: FontWeight.bold,
+              fontSize: 14,
               fontFeatures: const [FontFeature.tabularFigures()],
             ),
           ),

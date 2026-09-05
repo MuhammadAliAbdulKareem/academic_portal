@@ -4,7 +4,6 @@ import '../../../../core/design_system/components/portal_button.dart';
 import '../../../../core/design_system/components/portal_card.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/quiz_entity.dart';
 
 class QuizResultCard extends StatelessWidget {
@@ -55,14 +54,16 @@ class QuizResultCard extends StatelessWidget {
                     children: [
                       Text(
                         '${attempt.percentage.toStringAsFixed(0)}%',
-                        style: AppTypography.headlineSmall.copyWith(
+                        style: TextStyle(
+                          fontSize: 22,
                           color: statusColor,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
                         isPassed ? 'PASSED' : 'FAILED',
-                        style: AppTypography.labelSmall.copyWith(
+                        style: TextStyle(
+                          fontSize: 10,
                           color: statusColor,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 1,
@@ -77,17 +78,19 @@ class QuizResultCard extends StatelessWidget {
               // Title & Course
               Text(
                 quiz.title,
-                style: AppTypography.titleMedium.copyWith(
-                  color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                style: TextStyle(
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
+                  color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.xs),
               Text(
                 quiz.courseTitle,
-                style: AppTypography.caption.copyWith(
-                  color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -122,19 +125,20 @@ class QuizResultCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.md),
                   decoration: BoxDecoration(
-                    color: isDark ? AppColors.darkSurface : AppColors.surface,
+                    color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
+                    border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.lightBorder),
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.info_outline, size: 20, color: AppColors.primary),
+                      const Icon(Icons.info_outline, size: 20, color: AppColors.primaryLight),
                       const SizedBox(width: AppSpacing.sm),
                       Expanded(
                         child: Text(
                           attempt.feedback!,
-                          style: AppTypography.bodySmall.copyWith(
-                            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
                           ),
                         ),
                       ),
@@ -153,9 +157,10 @@ class QuizResultCard extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
             child: Text(
               'Question-by-Question Review',
-              style: AppTypography.titleSmall.copyWith(
-                color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+              style: TextStyle(
+                fontSize: 15,
                 fontWeight: FontWeight.bold,
+                color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
               ),
             ),
           ),
@@ -178,9 +183,10 @@ class QuizResultCard extends StatelessWidget {
                       children: [
                         Text(
                           'Question ${index + 1}',
-                          style: AppTypography.labelMedium.copyWith(
-                            color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                          style: TextStyle(
+                            fontSize: 13,
                             fontWeight: FontWeight.bold,
+                            color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
                           ),
                         ),
                         const Spacer(),
@@ -195,9 +201,10 @@ class QuizResultCard extends StatelessWidget {
                     // Prompt
                     Text(
                       q.prompt,
-                      style: AppTypography.bodyMedium.copyWith(
-                        color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                      style: TextStyle(
+                        fontSize: 14,
                         fontWeight: FontWeight.w600,
+                        color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
                       ),
                     ),
                     const SizedBox(height: AppSpacing.sm),
@@ -216,18 +223,20 @@ class QuizResultCard extends StatelessWidget {
                         children: [
                           Text(
                             'Your Answer: ${_formatAnswer(q, studentAnswer)}',
-                            style: AppTypography.bodySmall.copyWith(
-                              color: isCorrect ? AppColors.success : AppColors.error,
+                            style: TextStyle(
+                              fontSize: 13,
                               fontWeight: FontWeight.w500,
+                              color: isCorrect ? AppColors.success : AppColors.error,
                             ),
                           ),
                           if (!isCorrect) ...[
                             const SizedBox(height: 4),
                             Text(
                               'Correct Answer: ${_formatCorrectAnswer(q)}',
-                              style: AppTypography.bodySmall.copyWith(
-                                color: AppColors.success,
+                              style: const TextStyle(
+                                fontSize: 13,
                                 fontWeight: FontWeight.bold,
+                                color: AppColors.success,
                               ),
                             ),
                           ],
@@ -244,14 +253,15 @@ class QuizResultCard extends StatelessWidget {
                           Icon(
                             Icons.lightbulb_outline,
                             size: 16,
-                            color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                            color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
                           ),
                           const SizedBox(width: AppSpacing.xs),
                           Expanded(
                             child: Text(
                               q.explanation,
-                              style: AppTypography.caption.copyWith(
-                                color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
                               ),
                             ),
                           ),
@@ -300,16 +310,18 @@ class QuizResultCard extends StatelessWidget {
       children: [
         Text(
           value,
-          style: AppTypography.titleMedium.copyWith(
-            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+          style: TextStyle(
+            fontSize: 15,
             fontWeight: FontWeight.bold,
+            color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
           ),
         ),
         const SizedBox(height: 2),
         Text(
           label,
-          style: AppTypography.caption.copyWith(
-            color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+          style: TextStyle(
+            fontSize: 12,
+            color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
           ),
         ),
       ],
@@ -320,7 +332,7 @@ class QuizResultCard extends StatelessWidget {
     return Container(
       width: 1,
       height: 30,
-      color: isDark ? AppColors.darkBorder : AppColors.border,
+      color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
     );
   }
 

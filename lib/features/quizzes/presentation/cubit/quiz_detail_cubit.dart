@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../domain/entities/quiz_entity.dart';
 import '../../domain/repositories/quiz_repository.dart';
 import 'quiz_detail_state.dart';
 

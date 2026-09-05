@@ -19,6 +19,11 @@ import '../../features/assignments/presentation/screens/assignment_grading_scree
 import '../../features/assignments/presentation/screens/course_gradebook_screen.dart';
 import '../../features/attendance/presentation/screens/attendance_screen.dart';
 import '../../features/attendance/presentation/screens/session_detail_screen.dart';
+import '../../features/quizzes/presentation/screens/quiz_list_screen.dart';
+import '../../features/quizzes/presentation/screens/quiz_detail_screen.dart';
+import '../../features/quizzes/presentation/screens/quiz_exam_screen.dart';
+import '../../features/quizzes/presentation/screens/quiz_builder_screen.dart';
+import '../../features/quizzes/presentation/screens/quiz_analytics_screen.dart';
 
 /// Helper to bridge Stream changes to GoRouter's Listenable refresh.
 class GoRouterRefreshStream extends ChangeNotifier {
@@ -175,6 +180,40 @@ class AppRouter {
           builder: (context, state) {
             final sessionId = state.pathParameters['id'] ?? '';
             return SessionDetailScreen(sessionId: sessionId);
+          },
+        ),
+        GoRoute(
+          path: RouteConstants.quizzes,
+          name: 'quizzes',
+          builder: (context, state) => const QuizListScreen(),
+        ),
+        GoRoute(
+          path: RouteConstants.quizBuilder,
+          name: 'quiz-builder',
+          builder: (context, state) => const QuizBuilderScreen(),
+        ),
+        GoRoute(
+          path: RouteConstants.quizDetail,
+          name: 'quiz-detail',
+          builder: (context, state) {
+            final quizId = state.pathParameters['id'] ?? '';
+            return QuizDetailScreen(quizId: quizId);
+          },
+        ),
+        GoRoute(
+          path: RouteConstants.quizExam,
+          name: 'quiz-exam',
+          builder: (context, state) {
+            final quizId = state.pathParameters['id'] ?? '';
+            return QuizExamScreen(quizId: quizId);
+          },
+        ),
+        GoRoute(
+          path: RouteConstants.quizAnalytics,
+          name: 'quiz-analytics',
+          builder: (context, state) {
+            final quizId = state.pathParameters['id'] ?? '';
+            return QuizAnalyticsScreen(quizId: quizId);
           },
         ),
       ],

@@ -3,7 +3,6 @@ import '../../../../core/design_system/components/portal_badge.dart';
 import '../../../../core/design_system/components/portal_card.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/quiz_entity.dart';
 
 class QuestionViewCard extends StatefulWidget {
@@ -73,9 +72,10 @@ class _QuestionViewCardState extends State<QuestionViewCard> {
             children: [
               Text(
                 'Question ${widget.questionNumber} of ${widget.totalQuestions}',
-                style: AppTypography.titleSmall.copyWith(
-                  color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                style: TextStyle(
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
+                  color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
                 ),
               ),
               const SizedBox(width: AppSpacing.sm),
@@ -92,7 +92,9 @@ class _QuestionViewCardState extends State<QuestionViewCard> {
               IconButton(
                 icon: Icon(
                   widget.isFlagged ? Icons.flag : Icons.outlined_flag,
-                  color: widget.isFlagged ? AppColors.warning : (isDark ? AppColors.darkTextSecondary : AppColors.textSecondary),
+                  color: widget.isFlagged
+                      ? AppColors.warning
+                      : (isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary),
                 ),
                 tooltip: widget.isFlagged ? 'Remove Flag' : 'Flag for Review',
                 onPressed: widget.onToggleFlag,
@@ -104,10 +106,11 @@ class _QuestionViewCardState extends State<QuestionViewCard> {
           // Question Prompt
           Text(
             widget.question.prompt,
-            style: AppTypography.bodyLarge.copyWith(
-              color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+            style: TextStyle(
+              fontSize: 16,
               fontWeight: FontWeight.w500,
               height: 1.5,
+              color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
@@ -150,10 +153,10 @@ class _QuestionViewCardState extends State<QuestionViewCard> {
               decoration: BoxDecoration(
                 color: isSelected
                     ? AppColors.primary.withValues(alpha: isDark ? 0.25 : 0.08)
-                    : (isDark ? AppColors.darkSurface : AppColors.surface),
+                    : (isDark ? AppColors.darkSurface : AppColors.lightSurface),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: isSelected ? AppColors.primary : (isDark ? AppColors.darkBorder : AppColors.border),
+                  color: isSelected ? AppColors.primaryLight : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
                   width: isSelected ? 2 : 1,
                 ),
               ),
@@ -164,18 +167,23 @@ class _QuestionViewCardState extends State<QuestionViewCard> {
                     height: 28,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: isSelected ? AppColors.primary : Colors.transparent,
+                      color: isSelected ? AppColors.primaryLight : Colors.transparent,
                       border: Border.all(
-                        color: isSelected ? AppColors.primary : (isDark ? AppColors.darkTextSecondary : AppColors.textSecondary),
+                        color: isSelected
+                            ? AppColors.primaryLight
+                            : (isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary),
                         width: 1.5,
                       ),
                     ),
                     child: Center(
                       child: Text(
                         String.fromCharCode(65 + index), // A, B, C, D
-                        style: AppTypography.labelSmall.copyWith(
-                          color: isSelected ? Colors.white : (isDark ? AppColors.darkTextSecondary : AppColors.textSecondary),
+                        style: TextStyle(
+                          fontSize: 12,
                           fontWeight: FontWeight.bold,
+                          color: isSelected
+                              ? Colors.white
+                              : (isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary),
                         ),
                       ),
                     ),
@@ -184,20 +192,21 @@ class _QuestionViewCardState extends State<QuestionViewCard> {
                   Expanded(
                     child: Text(
                       option,
-                      style: AppTypography.bodyMedium.copyWith(
-                        color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                      style: TextStyle(
+                        fontSize: 14,
                         fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                        color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
                       ),
                     ),
                   ),
-                  Radio<int>(
-                    value: index,
-                    groupValue: selectedIndex,
-                    onChanged: (val) {
-                      if (val != null) widget.onAnswerChanged(val);
-                    },
-                    activeColor: AppColors.primary,
-                  ),
+                  if (isSelected)
+                    const Icon(Icons.check_circle, color: AppColors.primaryLight, size: 22)
+                  else
+                    Icon(
+                      Icons.radio_button_unchecked,
+                      color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                      size: 22,
+                    ),
                 ],
               ),
             ),
@@ -217,9 +226,10 @@ class _QuestionViewCardState extends State<QuestionViewCard> {
       children: [
         Text(
           'Select all that apply:',
-          style: AppTypography.caption.copyWith(
-            color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+          style: TextStyle(
+            fontSize: 12,
             fontStyle: FontStyle.italic,
+            color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
           ),
         ),
         const SizedBox(height: AppSpacing.sm),
@@ -245,10 +255,10 @@ class _QuestionViewCardState extends State<QuestionViewCard> {
                 decoration: BoxDecoration(
                   color: isSelected
                       ? AppColors.primary.withValues(alpha: isDark ? 0.25 : 0.08)
-                      : (isDark ? AppColors.darkSurface : AppColors.surface),
+                      : (isDark ? AppColors.darkSurface : AppColors.lightSurface),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: isSelected ? AppColors.primary : (isDark ? AppColors.darkBorder : AppColors.border),
+                    color: isSelected ? AppColors.primaryLight : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
                     width: isSelected ? 2 : 1,
                   ),
                 ),
@@ -265,15 +275,16 @@ class _QuestionViewCardState extends State<QuestionViewCard> {
                         }
                         widget.onAnswerChanged(newSet.toList()..sort());
                       },
-                      activeColor: AppColors.primary,
+                      activeColor: AppColors.primaryLight,
                     ),
                     const SizedBox(width: AppSpacing.sm),
                     Expanded(
                       child: Text(
                         option,
-                        style: AppTypography.bodyMedium.copyWith(
-                          color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                        style: TextStyle(
+                          fontSize: 14,
                           fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                          color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
                         ),
                       ),
                     ),
@@ -330,10 +341,10 @@ class _QuestionViewCardState extends State<QuestionViewCard> {
         decoration: BoxDecoration(
           color: isSelected
               ? AppColors.primary.withValues(alpha: isDark ? 0.3 : 0.1)
-              : (isDark ? AppColors.darkSurface : AppColors.surface),
+              : (isDark ? AppColors.darkSurface : AppColors.lightSurface),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: isSelected ? AppColors.primary : (isDark ? AppColors.darkBorder : AppColors.border),
+            color: isSelected ? AppColors.primaryLight : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -342,14 +353,19 @@ class _QuestionViewCardState extends State<QuestionViewCard> {
             Icon(
               icon,
               size: 28,
-              color: isSelected ? AppColors.primary : (isDark ? AppColors.darkTextSecondary : AppColors.textSecondary),
+              color: isSelected
+                  ? AppColors.primaryLight
+                  : (isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary),
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
               label,
-              style: AppTypography.titleSmall.copyWith(
-                color: isSelected ? AppColors.primary : (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary),
+              style: TextStyle(
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
+                color: isSelected
+                    ? AppColors.primaryLight
+                    : (isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary),
               ),
             ),
           ],
@@ -368,26 +384,28 @@ class _QuestionViewCardState extends State<QuestionViewCard> {
           decoration: InputDecoration(
             hintText: 'Type your answer here...',
             filled: true,
-            fillColor: isDark ? AppColors.darkSurface : AppColors.surface,
+            fillColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: isDark ? AppColors.darkBorder : AppColors.border),
+              borderSide: BorderSide(color: isDark ? AppColors.darkBorder : AppColors.lightBorder),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.primary, width: 2),
+              borderSide: const BorderSide(color: AppColors.primaryLight, width: 2),
             ),
             contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.md),
           ),
-          style: AppTypography.bodyMedium.copyWith(
-            color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+          style: TextStyle(
+            fontSize: 14,
+            color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
           ),
         ),
         const SizedBox(height: AppSpacing.xs),
         Text(
           'Answers are case-insensitive.',
-          style: AppTypography.caption.copyWith(
-            color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+          style: TextStyle(
+            fontSize: 12,
+            color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
           ),
         ),
       ],
