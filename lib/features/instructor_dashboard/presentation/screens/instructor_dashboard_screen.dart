@@ -193,24 +193,11 @@ class _InstructorDashboardScreenState extends State<InstructorDashboardScreen> {
             ],
           );
 
-          final actionButtons = Wrap(
-            spacing: AppSpacing.sm,
-            runSpacing: AppSpacing.sm,
-            children: [
-              PortalButton(
-                label: 'Attendance Check-In',
-                icon: Icons.qr_code_scanner_rounded,
-                variant: PortalButtonVariant.ghost,
-                size: PortalButtonSize.md,
-                onPressed: () => context.go(RouteConstants.attendance),
-              ),
-              PortalButton(
-                label: '+ Create New Course',
-                variant: PortalButtonVariant.secondary,
-                size: PortalButtonSize.md,
-                onPressed: () => context.go(RouteConstants.courseCreate),
-              ),
-            ],
+          final actionButton = PortalButton(
+            label: '+ Create New Course',
+            variant: PortalButtonVariant.secondary,
+            size: PortalButtonSize.md,
+            onPressed: () => context.go(RouteConstants.courseCreate),
           );
 
           if (isMobile) {
@@ -219,7 +206,7 @@ class _InstructorDashboardScreenState extends State<InstructorDashboardScreen> {
               children: [
                 content,
                 const SizedBox(height: AppSpacing.lg),
-                actionButtons,
+                actionButton,
               ],
             );
           }
@@ -229,7 +216,7 @@ class _InstructorDashboardScreenState extends State<InstructorDashboardScreen> {
             children: [
               Expanded(child: content),
               const SizedBox(width: AppSpacing.lg),
-              actionButtons,
+              actionButton,
             ],
           );
         },

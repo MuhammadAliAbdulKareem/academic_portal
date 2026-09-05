@@ -262,47 +262,52 @@ class _AttendanceScreenState extends State<AttendanceScreen>
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryLight.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryLight.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(
+                          Icons.qr_code_scanner_rounded,
+                          color: AppColors.primaryLight,
+                          size: 22,
+                        ),
                       ),
-                      child: const Icon(
-                        Icons.qr_code_scanner_rounded,
-                        color: AppColors.primaryLight,
-                        size: 22,
+                      const SizedBox(width: 12),
+                      Flexible(
+                        child: Text(
+                          'Attendance & Check-In',
+                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      'Attendance & Check-In',
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  isInstructor
-                      ? 'Launch live lecture check-in QR codes, verify turnouts, and manage rosters.'
-                      : 'Scan class QR codes, submit PINs, and track your attendance record.',
-                  style: TextStyle(
-                    color: isDark
-                        ? AppColors.darkTextSecondary
-                        : AppColors.lightTextSecondary,
-                    fontSize: 13,
+                    ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 4),
+                  Text(
+                    isInstructor
+                        ? 'Launch live lecture check-in QR codes, verify turnouts, and manage rosters.'
+                        : 'Scan class QR codes, submit PINs, and track your attendance record.',
+                    style: TextStyle(
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.lightTextSecondary,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
             ),
-            if (isInstructor)
+            if (isInstructor) ...[
+              const SizedBox(width: 16),
               ElevatedButton.icon(
                 onPressed: () => _showStartSessionDialog(context),
                 icon: const Icon(Icons.add_circle_outline, size: 18),
@@ -316,6 +321,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
                   ),
                 ),
               ),
+            ],
           ],
         ),
       ],
@@ -772,7 +778,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
                               crossAxisCount: 2,
                               crossAxisSpacing: 16,
                               mainAxisSpacing: 16,
-                              mainAxisExtent: 180,
+                              mainAxisExtent: 260,
                             ),
                             itemCount: state.courseSummaries.length,
                             itemBuilder: (context, index) {

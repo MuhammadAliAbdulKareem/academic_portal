@@ -298,7 +298,9 @@ class AttendanceRemoteDataSourceImpl implements AttendanceRemoteDataSource {
     // End any currently open session for this course first
     for (int i = 0; i < _mockSessions.length; i++) {
       if (_mockSessions[i].courseId == courseId && _mockSessions[i].isActive) {
-        _mockSessions[i] = _mockSessions[i].copyWith(isActive: false) as AttendanceSessionModel;
+        _mockSessions[i] = AttendanceSessionModel.fromEntity(
+          _mockSessions[i].copyWith(isActive: false),
+        );
       }
     }
 
