@@ -4,6 +4,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.6.0] - 2026-09-05 — Student Portal & Course Enrollment
+
+### Added
+- Domain Layer:
+  - `EnrollmentEntity`, `EnrollmentStatus`, `StudentDashboardStats`, `StudentScheduleItem`, `StudentDeadlineEntity`, and `DayOfWeek`.
+  - `EnrollmentRepository` contract with enrollment, drop, grade check, weekly timetable queries, and academic standing stats.
+- Data Layer:
+  - `EnrollmentModel` with Firestore and JSON serialization / deserialization.
+  - `EnrollmentRemoteDataSource` & `EnrollmentRemoteDataSourceImpl` with pre-seeded demo student schedules, enrolled courses, assignment deadlines, and seat limit tracking.
+  - `EnrollmentRepositoryImpl` connecting data layer to domain contracts with robust error handling.
+- State Management:
+  - `EnrollmentCubit` & `EnrollmentState` (`Initial`, `Loading`, `Loaded`, `Enrolling`, `Enrolled`, `Dropping`, `Dropped`, `Error`) supporting real-time course enrollments, seat availability, credit checks, and drop actions.
+  - `StudentDashboardCubit` & `StudentDashboardState` (`Initial`, `Loading`, `Loaded`, `Error`) aggregating GPA, enrolled credits, attendance rate, weekly schedule timetable, and upcoming deadlines.
+- Presentation Components & Screens:
+  - `StudentScheduleCard`: Weekly timetable card with time badge, course code, venue, and live session pulse indicator.
+  - `EnrolledCourseCard`: Course enrollment card with instructor info, credits pill, grade pill, current status, attendance badge, and drop action.
+  - `StudentDeadlineCard`: Deadline reminder component showing due dates, urgency badge (urgent, impending, upcoming), and submission status.
+  - `StudentDashboardScreen`: Adaptive command center featuring student greeting, academic standing pill, 4 key KPI cards (GPA, Enrolled Credits / Max, Active Courses, Attendance Rate), weekly schedule timetable, current enrolled courses list with drop dialogs, and pending assignment deadlines.
+- Cross-Feature Course Catalog Integration:
+  - `CourseCard`: Dynamic "Enroll" / "Enrolled" / "Drop" action buttons based on live student enrollment state, credit checks, and section capacity.
+  - `CourseDetailScreen`: Direct course enrollment button with instant status feedback, credit check validation, and drop confirmation modal.
+  - `PortalNavigationShell`: Role-adaptive navigation dynamically routing students to `/student-dashboard` and instructors to `/instructor-dashboard`.
+- Routing & Dependency Injection:
+  - Added `RouteConstants.studentDashboard` (`/student-dashboard`) to router and top-level providers.
+  - Registered `EnrollmentRepository`, `EnrollmentCubit`, and `StudentDashboardCubit` in app-level providers.
+- Quality Assurance:
+  - Comprehensive unit and widget tests in `test/student_portal_test.dart` (33 total project tests passing cleanly across the entire suite).
+  - 0 static analysis issues on `flutter analyze`.
+  - Production web compilation verified with `flutter build web --release`.
+
 ## [v0.5.0] - 2026-09-05 — Course Management
 
 ### Added
