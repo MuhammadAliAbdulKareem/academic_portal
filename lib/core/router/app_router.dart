@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../constants/route_constants.dart';
 import '../../features/foundation/presentation/screens/foundation_screen.dart';
+import '../../features/design_system/presentation/screens/design_system_screen.dart';
 
 /// Global application navigation configuration utilizing GoRouter.
 class AppRouter {
@@ -24,6 +25,11 @@ class AppRouter {
         path: RouteConstants.foundation,
         name: 'foundation',
         builder: (context, state) => const FoundationScreen(),
+      ),
+      GoRoute(
+        path: RouteConstants.designSystem,
+        name: 'design-system',
+        builder: (context, state) => const DesignSystemScreen(),
       ),
       // Placeholder routes for subsequent feature branches
       GoRoute(
