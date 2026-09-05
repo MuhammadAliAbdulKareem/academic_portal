@@ -14,6 +14,8 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../../auth/presentation/cubit/auth_state.dart';
+import '../../../student_portal/presentation/cubit/enrollment_cubit.dart';
+import '../../../student_portal/presentation/cubit/enrollment_state.dart';
 import '../cubit/courses_cubit.dart';
 import '../cubit/courses_state.dart';
 import '../widgets/course_card.dart';
@@ -278,20 +280,28 @@ class _CourseListScreenState extends State<CourseListScreen> {
                     ((crossAxisCount - 1) * AppSpacing.md)) /
                 crossAxisCount;
 
-            return Wrap(
-              spacing: AppSpacing.md,
-              runSpacing: AppSpacing.md,
-              children: loaded.courses.map((course) {
-                return SizedBox(
-                  width: cardWidth,
-                  child: CourseCard(
-                    course: course,
-                    onTap: () {
-                      context.go('/courses/${course.id}');
-                    },
-                  ),
+            return BlocBuilder<EnrollmentCubit, EnrollmentState>(
+              builder: (context, enrollState) {
+                return Wrap(
+                  spacing: AppSpacing.md,
+                  runSpacing: AppSpacing.md,
+                  children: loaded.courses.map((course) {
+                    final isEnrolled = enrollState is EnrollmentLoaded &&
+                        enrollState.isEnrolled(course.id);
+
+                    return SizedBox(
+                      width: cardWidth,
+                      child: CourseCard(
+                        course: course,
+                        isEnrolled: isEnrolled,
+                        onTap: () {
+                          context.go('/courses/${course.id}');
+                        },
+                      ),
+                    );
+                  }).toList(),
                 );
-              }).toList(),
+              },
             );
           },
         );

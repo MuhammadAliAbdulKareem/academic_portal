@@ -15,6 +15,8 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../../auth/presentation/cubit/auth_state.dart';
+import '../../../student_portal/presentation/cubit/enrollment_cubit.dart';
+import '../../../student_portal/presentation/cubit/enrollment_state.dart';
 import '../../domain/entities/course_entity.dart';
 import '../cubit/courses_cubit.dart';
 import '../cubit/courses_state.dart';
@@ -41,6 +43,81 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     context.read<CoursesCubit>().loadCourseDetails(widget.courseId);
+
+    final authState = context.read<AuthCubit>().state;
+    final studentId = authState is Authenticated ? authState.user.id : 'demo-student-01';
+    context.read<EnrollmentCubit>().loadEnrollments(studentId);
+  }
+
+  void _enrollCourse(BuildContext context, CourseEntity course) {
+    final authState = context.read<AuthCubit>().state;
+    final studentId = authState is Authenticated ? authState.user.id : 'demo-student-01';
+
+    context.read<EnrollmentCubit>().enroll(
+          studentId: studentId,
+          course: course,
+        ).then((_) {
+      final enrollState = context.read<EnrollmentCubit>().state;
+      if (enrollState is EnrollmentLoaded && enrollState.isActionSuccess) {
+        // Refresh details to reflect updated seat count
+        context.read<CoursesCubit>().loadCourseDetails(course.id);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(enrollState.message ?? 'Enrolled in ${course.code} successfully!'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      } else if (enrollState is EnrollmentError) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(enrollState.message),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    });
+  }
+
+  void _confirmDropCourse(BuildContext context, CourseEntity course) {
+    showDialog<bool>(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        title: const Text('Drop Course Offering'),
+        content: Text(
+          'Are you sure you want to drop ${course.code}: ${course.title}? You will relinquish your enrolled seat.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogCtx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
+            onPressed: () => Navigator.of(dialogCtx).pop(true),
+            child: const Text('Drop Course', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    ).then((confirmed) {
+      if (confirmed == true && mounted) {
+        final authState = context.read<AuthCubit>().state;
+        final studentId = authState is Authenticated ? authState.user.id : 'demo-student-01';
+        context.read<EnrollmentCubit>().drop(
+              studentId: studentId,
+              courseId: course.id,
+            ).then((_) {
+          context.read<CoursesCubit>().loadCourseDetails(course.id);
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Dropped ${course.code} successfully.'),
+                backgroundColor: AppColors.secondary,
+              ),
+            );
+          }
+        });
+      }
+    });
   }
 
   @override
@@ -330,6 +407,34 @@ class _CourseDetailScreenState extends State<CourseDetailScreen>
                         content: Text('Managing course ${course.code}...'),
                         duration: const Duration(seconds: 2),
                       ),
+                    );
+                  },
+                )
+              else
+                BlocBuilder<EnrollmentCubit, EnrollmentState>(
+                  builder: (context, enrollState) {
+                    final isEnrolled = enrollState is EnrollmentLoaded &&
+                        enrollState.isEnrolled(course.id);
+
+                    if (isEnrolled) {
+                      return PortalButton(
+                        label: 'Enrolled (Drop)',
+                        variant: PortalButtonVariant.destructive,
+                        size: PortalButtonSize.sm,
+                        icon: Icons.check_circle_rounded,
+                        onPressed: () => _confirmDropCourse(context, course),
+                      );
+                    }
+
+                    return PortalButton(
+                      label: course.isFull ? 'Course Full' : 'Enroll in Course',
+                      variant: PortalButtonVariant.secondary,
+                      size: PortalButtonSize.sm,
+                      icon: Icons.add_circle_outline_rounded,
+                      disabled: course.isFull,
+                      onPressed: course.isFull
+                          ? null
+                          : () => _enrollCourse(context, course),
                     );
                   },
                 ),

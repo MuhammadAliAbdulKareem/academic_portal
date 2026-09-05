@@ -11,12 +11,14 @@ class CourseCard extends StatelessWidget {
   final CourseEntity course;
   final VoidCallback? onTap;
   final VoidCallback? onManage;
+  final bool isEnrolled;
 
   const CourseCard({
     super.key,
     required this.course,
     this.onTap,
     this.onManage,
+    this.isEnrolled = false,
   });
 
   @override
@@ -34,37 +36,49 @@ class CourseCard extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header: Code Badge + Department Pill
+              // Header: Code Badge + Department Pill + Optional Enrolled Badge
               Wrap(
                 alignment: WrapAlignment.spaceBetween,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 spacing: AppSpacing.xs,
                 runSpacing: AppSpacing.xs,
                 children: [
-                  PortalBadge(
-                    label: course.code,
-                    variant: PortalBadgeVariant.primary,
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.sm,
-                      vertical: AppSpacing.xxs,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isDark ? AppColors.darkSurfaceAlt : AppColors.lightSurfaceAlt,
-                      borderRadius: AppSpacing.roundedSm,
-                    ),
-                    child: Text(
-                      course.department,
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: isDark
-                            ? AppColors.darkTextSecondary
-                            : AppColors.lightTextSecondary,
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      PortalBadge(
+                        label: course.code,
+                        variant: PortalBadgeVariant.primary,
                       ),
-                    ),
+                      const SizedBox(width: AppSpacing.xs),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.sm,
+                          vertical: AppSpacing.xxs,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isDark ? AppColors.darkSurfaceAlt : AppColors.lightSurfaceAlt,
+                          borderRadius: AppSpacing.roundedSm,
+                        ),
+                        child: Text(
+                          course.department,
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: isDark
+                                ? AppColors.darkTextSecondary
+                                : AppColors.lightTextSecondary,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
+                  if (isEnrolled)
+                    const PortalBadge(
+                      label: 'ENROLLED',
+                      variant: PortalBadgeVariant.instructor,
+                      hasDot: true,
+                    ),
                 ],
               ),
               const SizedBox(height: AppSpacing.md),
