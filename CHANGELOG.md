@@ -4,6 +4,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.8.0] - 2026-09-06 — Live Attendance & QR Code Check-in System
+
+### Added
+- Domain Layer:
+  - `AttendanceSessionEntity`, `AttendanceRecordEntity`, `StudentAttendanceSummaryEntity`, `AttendanceStatus`, and `CheckInMethod`.
+  - `AttendanceRepository` contract covering session lifecycles (start, get active, expire, get course sessions), real-time student check-ins (QR code verification & 6-digit fallback PIN), faculty manual roster overrides, roster queries, and student attendance statistics.
+- Data Layer:
+  - `AttendanceSessionModel`, `AttendanceRecordModel`, and `StudentAttendanceSummaryModel` with comprehensive JSON & Firestore serialization / deserialization.
+  - `AttendanceRemoteDataSource` and `AttendanceRemoteDataSourceImpl` pre-seeded with realistic lectures (CS101, CS201, MATH301), active dynamically rotating QR tokens, cryptographic 6-digit PINs, full student rosters with check-in timestamps, and summary statistics.
+  - `AttendanceRepositoryImpl` connecting data layer to domain contracts with robust `ServerException` error handling.
+- State Management:
+  - `AttendanceSessionCubit` & `AttendanceSessionState` managing active lecture session lifecycles, real-time expiry countdowns, dynamic QR rotation, and session completion.
+  - `AttendanceRosterCubit` & `AttendanceRosterState` supporting real-time student roster updates, search filters, status tabs (Present, Late, Excused, Absent), manual status overrides, and CSV export.
+  - `StudentCheckInCubit` & `StudentCheckInState` handling QR token scanning and fallback 6-digit PIN verification.
+  - `StudentAttendanceHistoryCubit` & `StudentAttendanceHistoryState` tracking course-by-course attendance rates, session journals, and absence alert warnings.
+- Presentation Components & Screens:
+  - `PortalQrWidget`: Pure Flutter Canvas QR matrix renderer with finder patterns, quiet zones, and animated expiry progress ring.
+  - `SessionQrDisplayCard`: Instructor lecture projector display featuring live countdown timer, rotating QR code, large 6-digit fallback PIN with copy button, and live turnout progress bar.
+  - `QrScannerDialog`: Student check-in modal featuring animated laser scanline viewfinder, camera switcher simulation, and seamless 6-digit fallback PIN input.
+  - `AttendanceRecordTile`: Student roster item with status pill, check-in method badge, timestamp, and faculty override actions.
+  - `AttendanceStatsSummaryCard`: Attendance rate gauge, breakdown chips, and at-risk academic standing alert banner.
+  - `AttendanceScreen`: Dual-role adaptive hub for faculty projector/archives and student check-in/journal.
+  - `SessionDetailScreen`: Deep-dive session roster with status filters, search, manual override, and CSV export.
+- Cross-Feature Routing & Shell Integration:
+  - Added routes `RouteConstants.attendance` (`/attendance`) and `RouteConstants.attendanceSession` (`/attendance/session/:id`).
+  - Added `Attendance` navigation destination in `PortalNavigationShell`.
+  - Registered `AttendanceRepository` and all 4 cubits in `AcademicPortalApp` root providers.
+  - Connected `Attendance Rate` metric card on student dashboard and `Average Attendance` metric card on instructor dashboard directly to the attendance hub.
+- Quality Assurance:
+  - Comprehensive unit and widget tests in `test/attendance_test.dart` (55 total project tests passing cleanly across the entire suite).
+  - 0 static analysis issues on `flutter analyze`.
+  - Web production compilation verified with `flutter build web --release`.
+
 ## [v0.7.0] - 2026-09-05 — Assignment Submission & Grading System
 
 ### Added
