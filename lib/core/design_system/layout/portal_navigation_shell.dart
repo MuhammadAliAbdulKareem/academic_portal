@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../bloc/theme_cubit.dart';
 import '../../bloc/theme_state.dart';
 import '../../constants/app_constants.dart';
+import '../../constants/route_constants.dart';
 import '../../responsive/responsive_builder.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
+import '../../../features/auth/presentation/cubit/auth_cubit.dart';
+import '../../../features/auth/presentation/cubit/auth_state.dart';
 import '../components/portal_avatar.dart';
+import '../components/portal_badge.dart';
 
 /// Navigation item model representing destination routes.
 class PortalNavItem {
@@ -157,10 +162,41 @@ class _PortalNavigationShellState extends State<PortalNavigationShell> {
         ),
         if (widget.trailingHeaderAction != null) widget.trailingHeaderAction!,
         const SizedBox(width: AppSpacing.xs),
-        const PortalAvatar(
-          name: 'Academic User',
-          size: PortalAvatarSize.sm,
-          isOnline: true,
+        BlocBuilder<AuthCubit, AuthState>(
+          builder: (context, authState) {
+            if (authState is Authenticated) {
+              final user = authState.user;
+              return Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  PortalBadge(
+                    label: user.role.displayName.toUpperCase(),
+                    variant: user.role.isInstructor
+                        ? PortalBadgeVariant.instructor
+                        : PortalBadgeVariant.student,
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  PortalAvatar(
+                    name: user.displayName,
+                    size: PortalAvatarSize.sm,
+                    isOnline: true,
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                  IconButton(
+                    icon: const Icon(Icons.logout_rounded, size: 18),
+                    tooltip: 'Sign Out (${user.displayName})',
+                    onPressed: () => context.read<AuthCubit>().logout(),
+                  ),
+                ],
+              );
+            }
+
+            return TextButton.icon(
+              onPressed: () => context.go(RouteConstants.login),
+              icon: const Icon(Icons.login_rounded, size: 16),
+              label: const Text('Sign In', style: TextStyle(fontWeight: FontWeight.bold)),
+            );
+          },
         ),
         const SizedBox(width: AppSpacing.md),
       ],
