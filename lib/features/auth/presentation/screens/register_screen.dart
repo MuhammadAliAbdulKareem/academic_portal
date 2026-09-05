@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/constants/route_constants.dart';
-import '../../../../core/design_system/components/portal_badge.dart';
 import '../../../../core/design_system/components/portal_button.dart';
 import '../../../../core/design_system/components/portal_card.dart';
 import '../../../../core/design_system/components/portal_text_field.dart';
@@ -275,8 +274,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         const SizedBox(height: AppSpacing.lg),
 
                         // Login Link
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
                             Text(
                               'Already have an account?',

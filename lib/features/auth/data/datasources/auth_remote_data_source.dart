@@ -208,15 +208,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   UserModel? get currentUser {
-    if (_isFirebaseOperational && _auth!.currentUser != null) {
-      final user = _auth!.currentUser!;
-      return UserModel(
-        id: user.uid,
-        email: user.email ?? '',
-        displayName: user.displayName ?? 'Portal User',
-        role: UserRole.student,
-        createdAt: DateTime.now(),
-      );
+    if (_isFirebaseOperational) {
+      final user = _auth?.currentUser;
+      if (user != null) {
+        return UserModel(
+          id: user.uid,
+          email: user.email ?? '',
+          displayName: user.displayName ?? 'Portal User',
+          role: UserRole.student,
+          createdAt: DateTime.now(),
+        );
+      }
     }
     return _mockCurrentUser;
   }
