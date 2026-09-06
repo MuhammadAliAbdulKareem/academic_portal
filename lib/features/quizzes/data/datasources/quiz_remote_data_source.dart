@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../../core/firebase/firebase_config.dart';
 import '../models/quiz_model.dart';
 import '../../domain/entities/quiz_entity.dart';
 
@@ -28,13 +30,16 @@ abstract class QuizRemoteDataSource {
 }
 
 class QuizRemoteDataSourceImpl implements QuizRemoteDataSource {
+  final FirebaseFirestore? _firestore;
   final List<QuizModel> _quizzes = [];
   final Map<String, List<QuizQuestionModel>> _questions = {};
   final List<QuizAttemptModel> _attempts = [];
 
-  QuizRemoteDataSourceImpl() {
+  QuizRemoteDataSourceImpl({FirebaseFirestore? firestore}) : _firestore = firestore {
     _seedData();
   }
+
+  bool get _isFirebaseReady => FirebaseConfig.isInitialized && _firestore != null;
 
   void _seedData() {
     final now = DateTime.now();
@@ -404,6 +409,21 @@ class QuizRemoteDataSourceImpl implements QuizRemoteDataSource {
 
   @override
   Future<List<QuizModel>> getAllQuizzes({String? courseId, String? studentId}) async {
+    if (_isFirebaseReady) {
+      try {
+        Query<Map<String, dynamic>> query = _firestore!.collection('quizzes');
+        if (courseId != null && courseId.isNotEmpty) {
+          query = query.where('courseId', isEqualTo: courseId);
+        }
+        final snap = await query.get();
+        if (snap.docs.isNotEmpty) {
+          return snap.docs
+              .map((d) => QuizModel.fromJson({...d.data(), 'id': d.id}))
+              .toList();
+        }
+      } catch (_) {}
+    }
+
     await Future.delayed(const Duration(milliseconds: 150));
     var results = List<QuizModel>.from(_quizzes);
     if (courseId != null && courseId.isNotEmpty) {
@@ -419,6 +439,15 @@ class QuizRemoteDataSourceImpl implements QuizRemoteDataSource {
 
   @override
   Future<QuizModel> getQuizById(String quizId) async {
+    if (_isFirebaseReady) {
+      try {
+        final doc = await _firestore!.collection('quizzes').doc(quizId).get();
+        if (doc.exists && doc.data() != null) {
+          return QuizModel.fromJson({...doc.data()!, 'id': doc.id});
+        }
+      } catch (_) {}
+    }
+
     await Future.delayed(const Duration(milliseconds: 100));
     final index = _quizzes.indexWhere((q) => q.id == quizId);
     if (index == -1) {
@@ -429,6 +458,21 @@ class QuizRemoteDataSourceImpl implements QuizRemoteDataSource {
 
   @override
   Future<List<QuizQuestionModel>> getQuizQuestions(String quizId) async {
+    if (_isFirebaseReady) {
+      try {
+        final snap = await _firestore!
+            .collection('quizzes')
+            .doc(quizId)
+            .collection('questions')
+            .get();
+        if (snap.docs.isNotEmpty) {
+          return snap.docs
+              .map((d) => QuizQuestionModel.fromJson({...d.data(), 'id': d.id}))
+              .toList();
+        }
+      } catch (_) {}
+    }
+
     await Future.delayed(const Duration(milliseconds: 100));
     final list = _questions[quizId] ?? [];
     return List<QuizQuestionModel>.from(list);
@@ -436,35 +480,70 @@ class QuizRemoteDataSourceImpl implements QuizRemoteDataSource {
 
   @override
   Future<QuizModel> createQuiz(QuizModel quiz, List<QuizQuestionModel> questions) async {
-    await Future.delayed(const Duration(milliseconds: 250));
-    final newId = 'quiz_${DateTime.now().millisecondsSinceEpoch}';
-    final computedPoints = questions.fold<int>(0, (sum, q) => sum + q.points);
+    final newId = quiz.id.isNotEmpty ? quiz.id : 'quiz_${DateTime.now().millisecondsSinceEpoch}';
+    final computedPoints = questions.fold<int>(0, (total, q) => total + q.points);
     final newQuiz = quiz.copyWith(
       id: newId,
       totalPoints: computedPoints > 0 ? computedPoints : quiz.totalPoints,
       questionsCount: questions.length,
     );
     final model = QuizModel.fromEntity(newQuiz);
+
+    if (_isFirebaseReady) {
+      try {
+        await _firestore!.collection('quizzes').doc(newId).set(model.toJson());
+        final batch = _firestore.batch();
+        for (final q in questions) {
+          final qId = q.id.isNotEmpty
+              ? q.id
+              : 'q_${DateTime.now().millisecondsSinceEpoch}_${questions.indexOf(q)}';
+          final mappedQ = q.copyWith(id: qId, quizId: newId);
+          final ref = _firestore
+              .collection('quizzes')
+              .doc(newId)
+              .collection('questions')
+              .doc(qId);
+          batch.set(ref, QuizQuestionModel.fromEntity(mappedQ).toJson());
+        }
+        await batch.commit();
+      } catch (_) {}
+    }
+
+    await Future.delayed(const Duration(milliseconds: 250));
     _quizzes.insert(0, model);
 
-    final mappedQuestions = questions.map((q) => q.copyWith(quizId: newId)).map(QuizQuestionModel.fromEntity).toList();
+    final mappedQuestions = questions
+        .map((q) => q.copyWith(quizId: newId))
+        .map(QuizQuestionModel.fromEntity)
+        .toList();
     _questions[newId] = mappedQuestions;
     return model;
   }
 
   @override
   Future<QuizModel> updateQuiz(QuizModel quiz) async {
+    if (_isFirebaseReady) {
+      try {
+        await _firestore!.collection('quizzes').doc(quiz.id).set(quiz.toJson());
+      } catch (_) {}
+    }
+
     await Future.delayed(const Duration(milliseconds: 150));
     final index = _quizzes.indexWhere((q) => q.id == quiz.id);
-    if (index == -1) {
-      throw Exception('Quiz not found: ${quiz.id}');
+    if (index != -1) {
+      _quizzes[index] = quiz;
     }
-    _quizzes[index] = quiz;
     return quiz;
   }
 
   @override
   Future<void> deleteQuiz(String quizId) async {
+    if (_isFirebaseReady) {
+      try {
+        await _firestore!.collection('quizzes').doc(quizId).delete();
+      } catch (_) {}
+    }
+
     await Future.delayed(const Duration(milliseconds: 150));
     _quizzes.removeWhere((q) => q.id == quizId);
     _questions.remove(quizId);
@@ -478,7 +557,6 @@ class QuizRemoteDataSourceImpl implements QuizRemoteDataSource {
     required String studentName,
     String? studentAvatar,
   }) async {
-    await Future.delayed(const Duration(milliseconds: 200));
     final quiz = await getQuizById(quizId);
     final existingAttempts = await getStudentQuizAttempts(quizId: quizId, studentId: studentId);
     if (existingAttempts.length >= quiz.maxAttempts) {
@@ -498,6 +576,14 @@ class QuizRemoteDataSourceImpl implements QuizRemoteDataSource {
       passed: false,
       isAutoGraded: false,
     );
+
+    if (_isFirebaseReady) {
+      try {
+        await _firestore!.collection('quiz_attempts').doc(newAttempt.id).set(newAttempt.toJson());
+      } catch (_) {}
+    }
+
+    await Future.delayed(const Duration(milliseconds: 200));
     _attempts.add(newAttempt);
     return newAttempt;
   }
@@ -507,13 +593,22 @@ class QuizRemoteDataSourceImpl implements QuizRemoteDataSource {
     required String attemptId,
     required Map<String, dynamic> answers,
   }) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    final index = _attempts.indexWhere((a) => a.id == attemptId);
-    if (index == -1) {
+    QuizAttemptModel? currentAttempt =
+        _attempts.where((a) => a.id == attemptId).firstOrNull;
+
+    if (currentAttempt == null && _isFirebaseReady) {
+      try {
+        final doc = await _firestore!.collection('quiz_attempts').doc(attemptId).get();
+        if (doc.exists && doc.data() != null) {
+          currentAttempt = QuizAttemptModel.fromJson({...doc.data()!, 'id': doc.id});
+        }
+      } catch (_) {}
+    }
+
+    if (currentAttempt == null) {
       throw Exception('Attempt not found: $attemptId');
     }
 
-    final currentAttempt = _attempts[index];
     final quiz = await getQuizById(currentAttempt.quizId);
     final questions = await getQuizQuestions(currentAttempt.quizId);
 
@@ -546,7 +641,20 @@ class QuizRemoteDataSourceImpl implements QuizRemoteDataSource {
     );
 
     final updatedModel = QuizAttemptModel.fromEntity(updated);
-    _attempts[index] = updatedModel;
+
+    if (_isFirebaseReady) {
+      try {
+        await _firestore!.collection('quiz_attempts').doc(updatedModel.id).set(updatedModel.toJson());
+      } catch (_) {}
+    }
+
+    await Future.delayed(const Duration(milliseconds: 300));
+    final index = _attempts.indexWhere((a) => a.id == attemptId);
+    if (index != -1) {
+      _attempts[index] = updatedModel;
+    } else {
+      _attempts.add(updatedModel);
+    }
     return updatedModel;
   }
 
@@ -555,6 +663,23 @@ class QuizRemoteDataSourceImpl implements QuizRemoteDataSource {
     required String quizId,
     required String studentId,
   }) async {
+    if (_isFirebaseReady) {
+      try {
+        final snap = await _firestore!
+            .collection('quiz_attempts')
+            .where('quizId', isEqualTo: quizId)
+            .where('studentId', isEqualTo: studentId)
+            .get();
+        if (snap.docs.isNotEmpty) {
+          final list = snap.docs
+              .map((d) => QuizAttemptModel.fromJson({...d.data(), 'id': d.id}))
+              .toList();
+          list.sort((a, b) => b.startedAt.compareTo(a.startedAt));
+          return list;
+        }
+      } catch (_) {}
+    }
+
     await Future.delayed(const Duration(milliseconds: 100));
     return _attempts
         .where((a) => a.quizId == quizId && a.studentId == studentId)
@@ -564,6 +689,22 @@ class QuizRemoteDataSourceImpl implements QuizRemoteDataSource {
 
   @override
   Future<List<QuizAttemptModel>> getQuizRosterAttempts(String quizId) async {
+    if (_isFirebaseReady) {
+      try {
+        final snap = await _firestore!
+            .collection('quiz_attempts')
+            .where('quizId', isEqualTo: quizId)
+            .get();
+        if (snap.docs.isNotEmpty) {
+          final list = snap.docs
+              .map((d) => QuizAttemptModel.fromJson({...d.data(), 'id': d.id}))
+              .toList();
+          list.sort((a, b) => b.startedAt.compareTo(a.startedAt));
+          return list;
+        }
+      } catch (_) {}
+    }
+
     await Future.delayed(const Duration(milliseconds: 150));
     return _attempts.where((a) => a.quizId == quizId).toList()
       ..sort((a, b) => b.startedAt.compareTo(a.startedAt));
@@ -571,8 +712,7 @@ class QuizRemoteDataSourceImpl implements QuizRemoteDataSource {
 
   @override
   Future<QuizSummaryStatsModel> getQuizStats(String quizId) async {
-    await Future.delayed(const Duration(milliseconds: 100));
-    final attempts = _attempts.where((a) => a.quizId == quizId && a.isCompleted).toList();
+    final attempts = (await getQuizRosterAttempts(quizId)).where((a) => a.isCompleted).toList();
     if (attempts.isEmpty) {
       return QuizSummaryStatsModel(
         quizId: quizId,

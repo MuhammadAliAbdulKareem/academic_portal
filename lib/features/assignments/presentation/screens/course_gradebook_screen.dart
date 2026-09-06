@@ -51,76 +51,74 @@ class _CourseGradebookScreenState extends State<CourseGradebookScreen> {
 
     return PortalNavigationShell(
       selectedIndex: 1, // Courses tab
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_rounded),
-            onPressed: () => context.canPop() ? context.pop() : context.go('/courses'),
-          ),
-          title: Text(
-            'Course Gradebook',
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: AppSpacing.md),
-              child: PortalButton(
-                label: 'Export CSV',
-                variant: PortalButtonVariant.outline,
-                size: PortalButtonSize.sm,
-                icon: Icons.file_download_outlined,
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Gradebook CSV report exported successfully!'),
-                      backgroundColor: AppColors.success,
-                    ),
-                  );
-                },
+      child: BlocBuilder<GradebookCubit, GradebookState>(
+        builder: (context, state) {
+          if (state is GradebookLoading) {
+            return const Padding(
+              padding: EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                children: [
+                  PortalSkeleton.card(height: 120),
+                  SizedBox(height: AppSpacing.md),
+                  PortalSkeleton.card(height: 350),
+                ],
               ),
-            ),
-          ],
-        ),
-        body: BlocBuilder<GradebookCubit, GradebookState>(
-          builder: (context, state) {
-            if (state is GradebookLoading) {
-              return const Padding(
-                padding: EdgeInsets.all(AppSpacing.lg),
-                child: Column(
-                  children: [
-                    PortalSkeleton.card(height: 120),
-                    SizedBox(height: AppSpacing.md),
-                    PortalSkeleton.card(height: 350),
-                  ],
-                ),
-              );
-            }
+            );
+          }
 
-            if (state is GradebookError) {
-              return Center(
-                child: PortalEmptyState(
-                  icon: Icons.error_outline_rounded,
-                  title: 'Unable to Load Gradebook',
-                  description: state.message,
-                  actionLabel: 'Try Again',
-                  onActionPressed: _loadData,
-                ),
-              );
-            }
+          if (state is GradebookError) {
+            return Center(
+              child: PortalEmptyState(
+                icon: Icons.error_outline_rounded,
+                title: 'Unable to Load Gradebook',
+                description: state.message,
+                actionLabel: 'Try Again',
+                onActionPressed: _loadData,
+              ),
+            );
+          }
 
-            if (state is GradebookLoaded) {
-              final gb = state.gradebook;
+          if (state is GradebookLoaded) {
+            final gb = state.gradebook;
 
-              return SingleChildScrollView(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Inline Navigation Header
+                  Row(
+                    children: [
+                      TextButton.icon(
+                        icon: const Icon(Icons.arrow_back_rounded, size: 16),
+                        label: const Text('Back to Course'),
+                        onPressed: () => context.canPop() ? context.pop() : context.go('/courses'),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Text(
+                        'Course Gradebook',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const Spacer(),
+                      PortalButton(
+                        label: 'Export CSV',
+                        variant: PortalButtonVariant.outline,
+                        size: PortalButtonSize.sm,
+                        icon: Icons.file_download_outlined,
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Gradebook CSV report exported successfully!'),
+                              backgroundColor: AppColors.success,
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.md),
                     // Course Header & KPI cards
                     Wrap(
                       spacing: AppSpacing.md,
@@ -333,7 +331,6 @@ class _CourseGradebookScreenState extends State<CourseGradebookScreen> {
             return const SizedBox.shrink();
           },
         ),
-      ),
     );
   }
 

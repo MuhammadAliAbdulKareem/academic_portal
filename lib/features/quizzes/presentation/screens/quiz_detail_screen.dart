@@ -5,6 +5,7 @@ import '../../../../core/design_system/components/portal_badge.dart';
 import '../../../../core/design_system/components/portal_button.dart';
 import '../../../../core/design_system/components/portal_card.dart';
 import '../../../../core/design_system/components/portal_skeleton.dart';
+import '../../../../core/design_system/layout/portal_navigation_shell.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../auth/domain/entities/user_entity.dart';
@@ -27,6 +28,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       final authState = context.read<AuthCubit>().state;
       String? studentId;
       if (authState is Authenticated && authState.user.role == UserRole.student) {
@@ -44,34 +46,21 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
     final isInstructor = authState is Authenticated &&
         authState.user.role == UserRole.instructor;
 
-    return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.lightBackground,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded),
-          onPressed: () => context.canPop() ? context.pop() : context.go('/quizzes'),
-        ),
-        title: const Text('Quiz Details'),
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-      ),
-      body: BlocBuilder<QuizDetailCubit, QuizDetailState>(
+    return PortalNavigationShell(
+      selectedIndex: 4,
+      child: BlocBuilder<QuizDetailCubit, QuizDetailState>(
         builder: (context, state) {
+          Widget content;
           if (state is QuizDetailLoading || state is QuizDetailInitial) {
-            return const Padding(
-              padding: EdgeInsets.all(AppSpacing.lg),
-              child: Column(
-                children: [
-                  PortalSkeleton.card(height: 120),
-                  SizedBox(height: AppSpacing.md),
-                  PortalSkeleton.card(height: 200),
-                ],
-              ),
+            content = const Column(
+              children: [
+                PortalSkeleton.card(height: 120),
+                SizedBox(height: AppSpacing.md),
+                PortalSkeleton.card(height: 200),
+              ],
             );
-          }
-
-          if (state is QuizDetailError) {
-            return Center(
+          } else if (state is QuizDetailError) {
+            content = Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -89,23 +78,55 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
                 ],
               ),
             );
+          } else if (state is QuizDetailLoaded) {
+            content = _buildLoadedQuiz(context, state, isInstructor, isDark);
+          } else {
+            content = const SizedBox.shrink();
           }
 
-          if (state is QuizDetailLoaded) {
-            final quiz = state.quiz;
-            final now = DateTime.now();
-            final isPast = now.isAfter(quiz.dueDate);
-            final isOpen = quiz.isPublished && !isPast && now.isAfter(quiz.availableFrom);
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 850),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: TextButton.icon(
+                        onPressed: () => context.canPop() ? context.pop() : context.go('/quizzes'),
+                        icon: const Icon(Icons.arrow_back_rounded, size: 16),
+                        label: const Text('Back to Quizzes'),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    content,
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
 
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 850),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      // Header Card
+  Widget _buildLoadedQuiz(
+    BuildContext context,
+    QuizDetailLoaded state,
+    bool isInstructor,
+    bool isDark,
+  ) {
+    final quiz = state.quiz;
+    final now = DateTime.now();
+    final isPast = now.isAfter(quiz.dueDate);
+    final isOpen = quiz.isPublished && !isPast && now.isAfter(quiz.availableFrom);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Header Card
                       PortalCard(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -367,16 +388,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
                           ),
                         ),
                     ],
-                  ),
-                ),
-              ),
-            );
-          }
-
-          return const SizedBox.shrink();
-        },
-      ),
-    );
+                  );
   }
 
   Widget _buildParam({

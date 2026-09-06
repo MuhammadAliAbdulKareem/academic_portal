@@ -7,6 +7,7 @@ import '../../../../core/design_system/components/portal_button.dart';
 import '../../../../core/design_system/components/portal_card.dart';
 import '../../../../core/design_system/components/portal_skeleton.dart';
 import '../../../../core/responsive/responsive_layout.dart';
+import '../../../../core/design_system/layout/portal_navigation_shell.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../cubit/quiz_analytics_cubit.dart';
@@ -28,6 +29,7 @@ class _QuizAnalyticsScreenState extends State<QuizAnalyticsScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       context.read<QuizAnalyticsCubit>().loadAnalytics(widget.quizId);
     });
   }
@@ -54,18 +56,9 @@ class _QuizAnalyticsScreenState extends State<QuizAnalyticsScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.lightBackground,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded),
-          onPressed: () => context.canPop() ? context.pop() : context.go('/quizzes'),
-        ),
-        title: const Text('Assessment Analytics & Roster'),
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-      ),
-      body: BlocBuilder<QuizAnalyticsCubit, QuizAnalyticsState>(
+    return PortalNavigationShell(
+      selectedIndex: 4,
+      child: BlocBuilder<QuizAnalyticsCubit, QuizAnalyticsState>(
         builder: (context, state) {
           if (state is QuizAnalyticsLoading || state is QuizAnalyticsInitial) {
             return const Padding(
@@ -110,6 +103,23 @@ class _QuizAnalyticsScreenState extends State<QuizAnalyticsScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      // Back Button & Title Header
+                      Row(
+                        children: [
+                          TextButton.icon(
+                            onPressed: () => context.canPop() ? context.pop() : context.go('/quizzes'),
+                            icon: const Icon(Icons.arrow_back_rounded, size: 16),
+                            label: const Text('Back to Quizzes'),
+                          ),
+                          const Spacer(),
+                          Text(
+                            'Assessment Analytics & Roster',
+                            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+
                       // Header Card
                       PortalCard(
                         child: Row(

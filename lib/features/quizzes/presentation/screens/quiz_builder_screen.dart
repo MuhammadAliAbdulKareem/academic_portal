@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/design_system/components/portal_badge.dart';
 import '../../../../core/design_system/components/portal_button.dart';
 import '../../../../core/design_system/components/portal_card.dart';
+import '../../../../core/design_system/layout/portal_navigation_shell.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../domain/entities/quiz_entity.dart';
@@ -272,18 +273,9 @@ class _QuizBuilderScreenState extends State<QuizBuilderScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.lightBackground,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded),
-          onPressed: () => context.canPop() ? context.pop() : context.go('/quizzes'),
-        ),
-        title: const Text('Create New Assessment'),
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-      ),
-      body: BlocConsumer<QuizBuilderCubit, QuizBuilderState>(
+    return PortalNavigationShell(
+      selectedIndex: 4,
+      child: BlocConsumer<QuizBuilderCubit, QuizBuilderState>(
         listener: (context, state) {
           if (state is QuizBuilderSaved) {
             context.read<QuizListCubit>().refresh();
@@ -318,6 +310,23 @@ class _QuizBuilderScreenState extends State<QuizBuilderScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    // Back Button & Title Header
+                    Row(
+                      children: [
+                        TextButton.icon(
+                          onPressed: () => context.canPop() ? context.pop() : context.go('/quizzes'),
+                          icon: const Icon(Icons.arrow_back_rounded, size: 16),
+                          label: const Text('Back to Quizzes'),
+                        ),
+                        const Spacer(),
+                        Text(
+                          'Create New Assessment',
+                          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+
                     // Quiz Settings Card
                     PortalCard(
                       child: Column(

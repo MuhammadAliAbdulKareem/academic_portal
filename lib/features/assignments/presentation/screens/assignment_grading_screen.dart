@@ -76,126 +76,133 @@ class _AssignmentGradingScreenState extends State<AssignmentGradingScreen> {
 
     return PortalNavigationShell(
       selectedIndex: 2,
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_rounded),
-            onPressed: () => context.canPop() ? context.pop() : context.go('/assignments'),
-          ),
-          title: Text(
-            'Instructor Grading Cockpit',
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
-        body: BlocConsumer<GradingCubit, GradingState>(
-          listener: (context, gradeState) {
-            if (gradeState is GradingSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    'Grade published for ${gradeState.submission.studentName}: ${gradeState.submission.score?.toInt()}/${gradeState.submission.maxScore?.toInt()} pts (${gradeState.submission.letterGrade})',
+      child: BlocConsumer<GradingCubit, GradingState>(
+        listener: (context, gradeState) {
+          if (gradeState is GradingSuccess) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Grade published for ${gradeState.submission.studentName}: ${gradeState.submission.score?.toInt()}/${gradeState.submission.maxScore?.toInt()} pts (${gradeState.submission.letterGrade})',
+                ),
+                backgroundColor: AppColors.success,
+              ),
+            );
+            _loadData();
+          } else if (gradeState is GradingFailure) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(gradeState.message),
+                backgroundColor: AppColors.error,
+              ),
+            );
+          }
+        },
+        builder: (context, gradeState) {
+          return BlocConsumer<AssignmentDetailCubit, AssignmentDetailState>(
+            listener: (context, state) {
+              if (state is AssignmentDetailLoaded && state.allSubmissions.isNotEmpty) {
+                final safeIndex =
+                    _selectedSubmissionIndex.clamp(0, state.allSubmissions.length - 1);
+                final selectedSub = state.allSubmissions[safeIndex];
+                _initGradingForSubmission(selectedSub, state.assignment.rubric);
+              }
+            },
+            builder: (context, state) {
+              if (state is AssignmentDetailLoading) {
+                return const Padding(
+                  padding: EdgeInsets.all(AppSpacing.lg),
+                  child: Column(
+                    children: [
+                      PortalSkeleton.card(height: 80),
+                      SizedBox(height: AppSpacing.md),
+                      PortalSkeleton.card(height: 350),
+                    ],
                   ),
-                  backgroundColor: AppColors.success,
-                ),
-              );
-              _loadData();
-            } else if (gradeState is GradingFailure) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(gradeState.message),
-                  backgroundColor: AppColors.error,
-                ),
-              );
-            }
-          },
-          builder: (context, gradeState) {
-            return BlocConsumer<AssignmentDetailCubit, AssignmentDetailState>(
-              listener: (context, state) {
-                if (state is AssignmentDetailLoaded && state.allSubmissions.isNotEmpty) {
-                  final safeIndex =
-                      _selectedSubmissionIndex.clamp(0, state.allSubmissions.length - 1);
-                  final selectedSub = state.allSubmissions[safeIndex];
-                  _initGradingForSubmission(selectedSub, state.assignment.rubric);
-                }
-              },
-              builder: (context, state) {
-                if (state is AssignmentDetailLoading) {
-                  return const Padding(
-                    padding: EdgeInsets.all(AppSpacing.lg),
-                    child: Column(
-                      children: [
-                        PortalSkeleton.card(height: 120),
-                        SizedBox(height: AppSpacing.md),
-                        PortalSkeleton.card(height: 350),
-                      ],
-                    ),
-                  );
-                }
+                );
+              }
 
-                if (state is AssignmentDetailError) {
+              if (state is AssignmentDetailError) {
+                return Center(
+                  child: PortalEmptyState(
+                    icon: Icons.error_outline_rounded,
+                    title: 'Grading Cockpit Unavailable',
+                    description: state.message,
+                    actionLabel: 'Back to Assignments',
+                    onActionPressed: () => context.pop(),
+                  ),
+                );
+              }
+
+              if (state is AssignmentDetailLoaded) {
+                if (state.allSubmissions.isEmpty) {
                   return Center(
                     child: PortalEmptyState(
-                      icon: Icons.error_outline_rounded,
-                      title: 'Unable to Load Submissions',
-                      description: state.message,
-                      actionLabel: 'Try Again',
-                      onActionPressed: _loadData,
+                      icon: Icons.inbox_rounded,
+                      title: 'No Submissions Received Yet',
+                      description:
+                          'Students have not submitted any work for "${state.assignment.title}".',
+                      actionLabel: 'Back to Overview',
+                      onActionPressed: () => context.pop(),
                     ),
                   );
                 }
 
-                if (state is AssignmentDetailLoaded) {
-                  final submissions = state.allSubmissions;
+                final safeIndex =
+                    _selectedSubmissionIndex.clamp(0, state.allSubmissions.length - 1);
+                final currentSub = state.allSubmissions[safeIndex];
 
-                  if (submissions.isEmpty) {
-                    return Center(
-                      child: PortalEmptyState(
-                        icon: Icons.assignment_late_outlined,
-                        title: 'No Submissions Yet',
-                        description:
-                            'None of the enrolled students have submitted work for this assignment.',
-                        actionLabel: 'Back to Assignments',
-                        onActionPressed: () => context.pop(),
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
+                        children: [
+                          TextButton.icon(
+                            icon: const Icon(Icons.arrow_back_rounded, size: 16),
+                            label: const Text('Back to Assignment'),
+                            onPressed: () => context.canPop() ? context.pop() : context.go('/assignments'),
+                          ),
+                          const Spacer(),
+                          Text(
+                            'Instructor Grading Cockpit',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
                       ),
-                    );
-                  }
+                      const SizedBox(height: AppSpacing.md),
+                      ResponsiveBuilder(
+                        builder: (context, sizingInfo) {
+                          if (sizingInfo.isDesktop) {
+                            return _buildDesktopLayout(
+                              context,
+                              state,
+                              currentSub,
+                              gradeState,
+                              instructorName,
+                            );
+                          } else {
+                            return _buildMobileLayout(
+                              context,
+                              state,
+                              currentSub,
+                              gradeState,
+                              instructorName,
+                            );
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              }
 
-                  final safeIndex = _selectedSubmissionIndex.clamp(0, submissions.length - 1);
-                  final currentSub = submissions[safeIndex];
-
-                  return ResponsiveBuilder(
-                    builder: (context, sizingInfo) {
-                      if (sizingInfo.isDesktop) {
-                        return _buildDesktopLayout(
-                          context,
-                          state,
-                          currentSub,
-                          gradeState,
-                          instructorName,
-                        );
-                      } else {
-                        return _buildMobileLayout(
-                          context,
-                          state,
-                          currentSub,
-                          gradeState,
-                          instructorName,
-                        );
-                      }
-                    },
-                  );
-                }
-
-                return const SizedBox.shrink();
-              },
-            );
-          },
-        ),
+              return const SizedBox.shrink();
+            },
+          );
+        },
       ),
     );
   }
@@ -207,45 +214,42 @@ class _AssignmentGradingScreenState extends State<AssignmentGradingScreen> {
     GradingState gradeState,
     String instructorName,
   ) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildSubmissionSelectorBar(state),
-          const SizedBox(height: AppSpacing.lg),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Left: Student Submission Preview & Content
-              Expanded(
-                flex: 3,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildStudentProfileCard(context, currentSub),
-                    const SizedBox(height: AppSpacing.md),
-                    _buildSubmissionArtifactsCard(context, currentSub),
-                  ],
-                ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSubmissionSelectorBar(state),
+        const SizedBox(height: AppSpacing.lg),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Left: Student Submission Preview & Content
+            Expanded(
+              flex: 3,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildStudentProfileCard(context, currentSub),
+                  const SizedBox(height: AppSpacing.md),
+                  _buildSubmissionArtifactsCard(context, currentSub),
+                ],
               ),
-              const SizedBox(width: AppSpacing.lg),
+            ),
+            const SizedBox(width: AppSpacing.lg),
 
-              // Right: Rubric Matrix & Grade Publishing Console
-              Expanded(
-                flex: 4,
-                child: _buildGradingConsole(
-                  context,
-                  state,
-                  currentSub,
-                  gradeState,
-                  instructorName,
-                ),
+            // Right: Rubric Matrix & Grade Publishing Console
+            Expanded(
+              flex: 4,
+              child: _buildGradingConsole(
+                context,
+                state,
+                currentSub,
+                gradeState,
+                instructorName,
               ),
-            ],
-          ),
-        ],
-      ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -256,26 +260,23 @@ class _AssignmentGradingScreenState extends State<AssignmentGradingScreen> {
     GradingState gradeState,
     String instructorName,
   ) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildSubmissionSelectorBar(state),
-          const SizedBox(height: AppSpacing.md),
-          _buildStudentProfileCard(context, currentSub),
-          const SizedBox(height: AppSpacing.md),
-          _buildSubmissionArtifactsCard(context, currentSub),
-          const SizedBox(height: AppSpacing.md),
-          _buildGradingConsole(
-            context,
-            state,
-            currentSub,
-            gradeState,
-            instructorName,
-          ),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSubmissionSelectorBar(state),
+        const SizedBox(height: AppSpacing.md),
+        _buildStudentProfileCard(context, currentSub),
+        const SizedBox(height: AppSpacing.md),
+        _buildSubmissionArtifactsCard(context, currentSub),
+        const SizedBox(height: AppSpacing.md),
+        _buildGradingConsole(
+          context,
+          state,
+          currentSub,
+          gradeState,
+          instructorName,
+        ),
+      ],
     );
   }
 

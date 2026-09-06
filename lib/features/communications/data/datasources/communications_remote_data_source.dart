@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../../core/firebase/firebase_config.dart';
 import '../../domain/entities/announcement_entity.dart';
 import '../../domain/entities/discussion_entity.dart';
 import '../../domain/entities/notification_entity.dart';
@@ -27,13 +29,16 @@ abstract class CommunicationsRemoteDataSource {
 }
 
 class CommunicationsRemoteDataSourceImpl implements CommunicationsRemoteDataSource {
+  final FirebaseFirestore? _firestore;
   final List<AnnouncementModel> _announcements = [];
   final List<DiscussionThreadModel> _discussions = [];
   final List<NotificationModel> _notifications = [];
 
-  CommunicationsRemoteDataSourceImpl() {
+  CommunicationsRemoteDataSourceImpl({FirebaseFirestore? firestore}) : _firestore = firestore {
     _seedData();
   }
+
+  bool get _isFirebaseReady => FirebaseConfig.isInitialized && _firestore != null;
 
   void _seedData() {
     final now = DateTime.now();
@@ -307,6 +312,26 @@ class CommunicationsRemoteDataSourceImpl implements CommunicationsRemoteDataSour
 
   @override
   Future<List<AnnouncementModel>> getAnnouncements({String? courseId, String? studentId}) async {
+    if (_isFirebaseReady) {
+      try {
+        Query<Map<String, dynamic>> query = _firestore!.collection('announcements');
+        if (courseId != null && courseId.isNotEmpty && courseId.toLowerCase() != 'all') {
+          query = query.where('courseId', isEqualTo: courseId);
+        }
+        final snap = await query.get();
+        if (snap.docs.isNotEmpty) {
+          final list = snap.docs
+              .map((d) => AnnouncementModel.fromJson({...d.data(), 'id': d.id}))
+              .toList();
+          list.sort((a, b) {
+            if (a.isPinned != b.isPinned) return a.isPinned ? -1 : 1;
+            return b.publishedAt.compareTo(a.publishedAt);
+          });
+          return list;
+        }
+      } catch (_) {}
+    }
+
     await Future.delayed(const Duration(milliseconds: 150));
     var results = List<AnnouncementModel>.from(_announcements);
 
@@ -326,8 +351,19 @@ class CommunicationsRemoteDataSourceImpl implements CommunicationsRemoteDataSour
 
   @override
   Future<AnnouncementModel> createAnnouncement(AnnouncementModel announcement) async {
+    final id = announcement.id.isNotEmpty
+        ? announcement.id
+        : 'ann-${DateTime.now().millisecondsSinceEpoch}';
+    final toSave = AnnouncementModel.fromEntity(announcement.copyWith(id: id));
+
+    if (_isFirebaseReady) {
+      try {
+        await _firestore!.collection('announcements').doc(id).set(toSave.toJson());
+      } catch (_) {}
+    }
+
     await Future.delayed(const Duration(milliseconds: 200));
-    _announcements.insert(0, announcement);
+    _announcements.insert(0, toSave);
 
     // Also dispatch a notification to demo student
     _notifications.insert(
@@ -344,7 +380,7 @@ class CommunicationsRemoteDataSourceImpl implements CommunicationsRemoteDataSour
       ),
     );
 
-    return announcement;
+    return toSave;
   }
 
   @override
@@ -366,6 +402,42 @@ class CommunicationsRemoteDataSourceImpl implements CommunicationsRemoteDataSour
     DiscussionCategory? category,
     String? searchQuery,
   }) async {
+    if (_isFirebaseReady) {
+      try {
+        Query<Map<String, dynamic>> query = _firestore!.collection('discussions');
+        if (courseId != null && courseId.isNotEmpty && courseId.toLowerCase() != 'all') {
+          query = query.where('courseId', isEqualTo: courseId);
+        }
+        final snap = await query.get();
+        if (snap.docs.isNotEmpty) {
+          var list = snap.docs
+              .map((d) => DiscussionThreadModel.fromJson({...d.data(), 'id': d.id}))
+              .toList();
+
+          if (category != null) {
+            list = list.where((t) => t.category == category).toList();
+          }
+
+          if (searchQuery != null && searchQuery.trim().isNotEmpty) {
+            final q = searchQuery.toLowerCase().trim();
+            list = list.where((t) {
+              return t.title.toLowerCase().contains(q) ||
+                  t.content.toLowerCase().contains(q) ||
+                  t.courseCode.toLowerCase().contains(q) ||
+                  t.tags.any((tag) => tag.toLowerCase().contains(q));
+            }).toList();
+          }
+
+          list.sort((a, b) {
+            if (a.isPinned != b.isPinned) return a.isPinned ? -1 : 1;
+            return b.updatedAt.compareTo(a.updatedAt);
+          });
+
+          return list;
+        }
+      } catch (_) {}
+    }
+
     await Future.delayed(const Duration(milliseconds: 150));
     var results = List<DiscussionThreadModel>.from(_discussions);
 
@@ -399,6 +471,29 @@ class CommunicationsRemoteDataSourceImpl implements CommunicationsRemoteDataSour
 
   @override
   Future<DiscussionThreadModel> getDiscussionThreadById(String threadId) async {
+    if (_isFirebaseReady) {
+      try {
+        final doc = await _firestore!.collection('discussions').doc(threadId).get();
+        if (doc.exists && doc.data() != null) {
+          final repliesSnap = await _firestore
+              .collection('discussions')
+              .doc(threadId)
+              .collection('replies')
+              .get();
+          final replies = repliesSnap.docs
+              .map((r) => DiscussionReplyModel.fromJson({...r.data(), 'id': r.id}))
+              .toList()
+            ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+
+          final base = DiscussionThreadModel.fromJson({...doc.data()!, 'id': doc.id});
+          return DiscussionThreadModel.fromEntity(base.copyWith(
+            replies: replies.isNotEmpty ? replies : base.replies,
+            repliesCount: replies.isNotEmpty ? replies.length : base.repliesCount,
+          ));
+        }
+      } catch (_) {}
+    }
+
     await Future.delayed(const Duration(milliseconds: 100));
     final thread = _discussions.firstWhere(
       (t) => t.id == threadId,
@@ -409,9 +504,20 @@ class CommunicationsRemoteDataSourceImpl implements CommunicationsRemoteDataSour
 
   @override
   Future<DiscussionThreadModel> createDiscussionThread(DiscussionThreadModel thread) async {
+    final id = thread.id.isNotEmpty
+        ? thread.id
+        : 'thread-${DateTime.now().millisecondsSinceEpoch}';
+    final toSave = DiscussionThreadModel.fromEntity(thread.copyWith(id: id));
+
+    if (_isFirebaseReady) {
+      try {
+        await _firestore!.collection('discussions').doc(id).set(toSave.toJson());
+      } catch (_) {}
+    }
+
     await Future.delayed(const Duration(milliseconds: 200));
-    _discussions.insert(0, thread);
-    return thread;
+    _discussions.insert(0, toSave);
+    return toSave;
   }
 
   @override
@@ -419,21 +525,40 @@ class CommunicationsRemoteDataSourceImpl implements CommunicationsRemoteDataSour
     required String threadId,
     required DiscussionReplyModel reply,
   }) async {
-    await Future.delayed(const Duration(milliseconds: 150));
-    final index = _discussions.indexWhere((t) => t.id == threadId);
-    if (index == -1) {
-      throw Exception('Discussion thread not found.');
+    final rId = reply.id.isNotEmpty
+        ? reply.id
+        : 'reply-${DateTime.now().millisecondsSinceEpoch}';
+    final toSave = DiscussionReplyModel.fromEntity(reply.copyWith(id: rId));
+
+    if (_isFirebaseReady) {
+      try {
+        await _firestore!
+            .collection('discussions')
+            .doc(threadId)
+            .collection('replies')
+            .doc(rId)
+            .set(toSave.toJson());
+
+        await _firestore.collection('discussions').doc(threadId).update({
+          'repliesCount': FieldValue.increment(1),
+          'lastActivityAt': DateTime.now().toIso8601String(),
+        });
+      } catch (_) {}
     }
 
-    final thread = _discussions[index];
-    final updatedReplies = List<DiscussionReplyEntity>.from(thread.replies)..add(reply);
-    _discussions[index] = DiscussionThreadModel.fromEntity(thread.copyWith(
-      replies: updatedReplies,
-      repliesCount: updatedReplies.length,
-      updatedAt: DateTime.now(),
-    ));
+    await Future.delayed(const Duration(milliseconds: 150));
+    final index = _discussions.indexWhere((t) => t.id == threadId);
+    if (index != -1) {
+      final thread = _discussions[index];
+      final updatedReplies = List<DiscussionReplyEntity>.from(thread.replies)..add(toSave);
+      _discussions[index] = DiscussionThreadModel.fromEntity(thread.copyWith(
+        replies: updatedReplies,
+        repliesCount: updatedReplies.length,
+        updatedAt: DateTime.now(),
+      ));
+    }
 
-    return reply;
+    return toSave;
   }
 
   @override

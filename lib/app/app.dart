@@ -7,6 +7,7 @@ import '../core/bloc/theme_cubit.dart';
 import '../core/bloc/theme_state.dart';
 import '../core/constants/app_constants.dart';
 import '../core/firebase/firebase_config.dart';
+import '../core/firebase/firebase_seeder.dart';
 import '../core/router/app_router.dart';
 import '../core/theme/app_theme.dart';
 import '../features/auth/data/datasources/auth_remote_data_source.dart';
@@ -127,6 +128,10 @@ class _AcademicPortalAppState extends State<AcademicPortalApp> {
     final firestore =
         FirebaseConfig.isInitialized ? FirebaseFirestore.instance : null;
 
+    if (firestore != null) {
+      FirebaseSeeder.seedIfEmpty(firestore);
+    }
+
     _authRepository = widget.authRepository ??
         AuthRepositoryImpl(
           remoteDataSource: AuthRemoteDataSourceImpl(
@@ -166,12 +171,12 @@ class _AcademicPortalAppState extends State<AcademicPortalApp> {
 
     _quizRepository = widget.quizRepository ??
         QuizRepositoryImpl(
-          remoteDataSource: QuizRemoteDataSourceImpl(),
+          remoteDataSource: QuizRemoteDataSourceImpl(firestore: firestore),
         );
 
     _communicationsRepository = widget.communicationsRepository ??
         CommunicationsRepositoryImpl(
-          remoteDataSource: CommunicationsRemoteDataSourceImpl(),
+          remoteDataSource: CommunicationsRemoteDataSourceImpl(firestore: firestore),
         );
 
     _authCubit = AuthCubit(authRepository: _authRepository);

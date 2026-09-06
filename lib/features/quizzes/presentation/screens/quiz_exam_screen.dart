@@ -29,6 +29,7 @@ class _QuizExamScreenState extends State<QuizExamScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       final authState = context.read<AuthCubit>().state;
       String studentId = 'student_demo';
       String studentName = 'Demo Student';

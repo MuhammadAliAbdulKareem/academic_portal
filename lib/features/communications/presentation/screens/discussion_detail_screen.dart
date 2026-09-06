@@ -6,6 +6,7 @@ import '../../../../core/design_system/components/portal_badge.dart';
 import '../../../../core/design_system/components/portal_button.dart';
 import '../../../../core/design_system/components/portal_card.dart';
 import '../../../../core/design_system/components/portal_skeleton.dart';
+import '../../../../core/design_system/layout/portal_navigation_shell.dart';
 import '../../../../core/responsive/responsive_layout.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -31,7 +32,10 @@ class _DiscussionDetailScreenState extends State<DiscussionDetailScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<DiscussionDetailCubit>().loadThread(widget.threadId);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<DiscussionDetailCubit>().loadThread(widget.threadId);
+    });
   }
 
   @override
@@ -75,9 +79,12 @@ class _DiscussionDetailScreenState extends State<DiscussionDetailScreen> {
     final isInstructor = authState is Authenticated && authState.user.role.isInstructor;
     final currentUserId = authState is Authenticated ? authState.user.id : 'demo-student-01';
 
-    return ResponsiveLayout(
-      mobile: _buildContent(context, isDark, isInstructor, currentUserId, isMobile: true),
-      desktop: _buildContent(context, isDark, isInstructor, currentUserId, isMobile: false),
+    return PortalNavigationShell(
+      selectedIndex: 6,
+      child: ResponsiveLayout(
+        mobile: _buildContent(context, isDark, isInstructor, currentUserId, isMobile: true),
+        desktop: _buildContent(context, isDark, isInstructor, currentUserId, isMobile: false),
+      ),
     );
   }
 
@@ -88,55 +95,61 @@ class _DiscussionDetailScreenState extends State<DiscussionDetailScreen> {
     String currentUserId, {
     required bool isMobile,
   }) {
-    return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.lightBackground,
-      appBar: AppBar(
-        title: const Text('Discussion Thread'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded),
-          onPressed: () => context.go('/discussions'),
-        ),
-      ),
-      body: BlocBuilder<DiscussionDetailCubit, DiscussionDetailState>(
-        builder: (context, state) {
-          if (state is DiscussionDetailLoading) {
-            return Padding(
-              padding: EdgeInsets.all(isMobile ? AppSpacing.md : AppSpacing.xl),
-              child: Column(
-                children: [
-                  PortalSkeleton.card(height: 220),
-                  const SizedBox(height: AppSpacing.md),
-                  PortalSkeleton.card(height: 120),
-                ],
-              ),
-            );
-          }
+    return BlocBuilder<DiscussionDetailCubit, DiscussionDetailState>(
+      builder: (context, state) {
+        if (state is DiscussionDetailLoading) {
+          return Padding(
+            padding: EdgeInsets.all(isMobile ? AppSpacing.md : AppSpacing.xl),
+            child: Column(
+              children: [
+                PortalSkeleton.card(height: 220),
+                const SizedBox(height: AppSpacing.md),
+                PortalSkeleton.card(height: 120),
+              ],
+            ),
+          );
+        }
 
-          if (state is DiscussionDetailError) {
-            return Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('Failed to load discussion: ${state.message}'),
-                  const SizedBox(height: AppSpacing.sm),
-                  PortalButton(
-                    label: 'Back to Discussions',
-                    onPressed: () => context.go('/discussions'),
-                  ),
-                ],
-              ),
-            );
-          }
+        if (state is DiscussionDetailError) {
+          return Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Failed to load discussion: ${state.message}'),
+                const SizedBox(height: AppSpacing.sm),
+                PortalButton(
+                  label: 'Back to Discussions',
+                  onPressed: () => context.go('/discussions'),
+                ),
+              ],
+            ),
+          );
+        }
 
-          if (state is DiscussionDetailLoaded) {
-            final thread = state.thread;
+        if (state is DiscussionDetailLoaded) {
+          final thread = state.thread;
 
-            return SingleChildScrollView(
-              padding: EdgeInsets.all(isMobile ? AppSpacing.md : AppSpacing.xl),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Original Question Card
+          return SingleChildScrollView(
+            padding: EdgeInsets.all(isMobile ? AppSpacing.md : AppSpacing.xl),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    TextButton.icon(
+                      onPressed: () => context.canPop() ? context.pop() : context.go('/discussions'),
+                      icon: const Icon(Icons.arrow_back_rounded, size: 16),
+                      label: const Text('Back to Discussions'),
+                    ),
+                    const Spacer(),
+                    Text(
+                      'Discussion Thread',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.md),
+                // Original Question Card
                   _buildThreadCard(context, thread, isDark),
                   const SizedBox(height: AppSpacing.xl),
 
@@ -232,8 +245,7 @@ class _DiscussionDetailScreenState extends State<DiscussionDetailScreen> {
 
           return const SizedBox.shrink();
         },
-      ),
-    );
+      );
   }
 
   Widget _buildThreadCard(BuildContext context, DiscussionThreadEntity thread, bool isDark) {

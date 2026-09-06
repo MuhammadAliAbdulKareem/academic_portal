@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/design_system/layout/portal_navigation_shell.dart';
 import '../../../../core/responsive/responsive_builder.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../domain/entities/attendance_entity.dart';
@@ -120,39 +121,13 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return ResponsiveBuilder(
-      builder: (context, sizingInfo) {
-        final horizontalPadding = sizingInfo.isDesktop ? 32.0 : 16.0;
+    return PortalNavigationShell(
+      selectedIndex: 3,
+      child: ResponsiveBuilder(
+        builder: (context, sizingInfo) {
+          final horizontalPadding = sizingInfo.isDesktop ? 32.0 : 16.0;
 
-        return Scaffold(
-          appBar: AppBar(
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () => context.canPop() ? context.pop() : context.go('/attendance'),
-            ),
-            title: const Text('Session Attendance Roster'),
-            actions: [
-              BlocBuilder<AttendanceRosterCubit, AttendanceRosterState>(
-                builder: (context, state) {
-                  if (state is AttendanceRosterLoaded) {
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 16),
-                      child: TextButton.icon(
-                        onPressed: () => _exportCsv(context, state.allRecords),
-                        icon: const Icon(Icons.download_rounded, size: 18),
-                        label: const Text('Export CSV'),
-                        style: TextButton.styleFrom(
-                          foregroundColor: AppColors.primaryLight,
-                        ),
-                      ),
-                    );
-                  }
-                  return const SizedBox.shrink();
-                },
-              ),
-            ],
-          ),
-          body: SingleChildScrollView(
+          return SingleChildScrollView(
             padding: EdgeInsets.symmetric(
               horizontal: horizontalPadding,
               vertical: 20,
@@ -160,26 +135,63 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
             child: Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 1100),
-                child: BlocBuilder<AttendanceRosterCubit, AttendanceRosterState>(
-                  builder: (context, state) {
-                    if (state is AttendanceRosterLoading) {
-                      return const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(60),
-                          child: CircularProgressIndicator(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Inline Navigation Header
+                    Row(
+                      children: [
+                        TextButton.icon(
+                          icon: const Icon(Icons.arrow_back_rounded, size: 16),
+                          label: const Text('Back to Attendance'),
+                          onPressed: () => context.canPop() ? context.pop() : context.go('/attendance'),
                         ),
-                      );
-                    }
+                        const Spacer(),
+                        Text(
+                          'Session Attendance Roster',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const Spacer(),
+                        BlocBuilder<AttendanceRosterCubit, AttendanceRosterState>(
+                          builder: (context, state) {
+                            if (state is AttendanceRosterLoaded) {
+                              return TextButton.icon(
+                                onPressed: () => _exportCsv(context, state.allRecords),
+                                icon: const Icon(Icons.download_rounded, size: 18),
+                                label: const Text('Export CSV'),
+                                style: TextButton.styleFrom(
+                                  foregroundColor: AppColors.primaryLight,
+                                ),
+                              );
+                            }
+                            return const SizedBox.shrink();
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    BlocBuilder<AttendanceRosterCubit, AttendanceRosterState>(
+                      builder: (context, state) {
+                        if (state is AttendanceRosterLoading) {
+                          return const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(60),
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                        }
 
-                    if (state is AttendanceRosterLoaded) {
-                      final total = state.allRecords.length;
-                      final attended = state.presentCount + state.lateCount;
-                      final rate = total > 0 ? (attended / total) * 100 : 0.0;
+                        if (state is AttendanceRosterLoaded) {
+                          final total = state.allRecords.length;
+                          final attended = state.presentCount + state.lateCount;
+                          final rate = total > 0 ? (attended / total) * 100 : 0.0;
 
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          // KPI Summary Cards
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              // KPI Summary Cards
                           _buildKpiSection(state, total, rate, isDark, sizingInfo),
                           const SizedBox(height: 24),
 
@@ -225,13 +237,15 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                     return const SizedBox.shrink();
                   },
                 ),
-              ),
+              ],
             ),
           ),
-        );
-      },
-    );
-  }
+        ),
+      );
+    },
+  ),
+);
+}
 
   Widget _buildKpiSection(
     AttendanceRosterLoaded state,

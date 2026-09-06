@@ -34,6 +34,7 @@ class _QuizListScreenState extends State<QuizListScreen> with SingleTickerProvid
     _tabController.addListener(_onTabChanged);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       final authState = context.read<AuthCubit>().state;
       String? studentId;
       if (authState is Authenticated && authState.user.role == UserRole.student) {

@@ -95,86 +95,94 @@ class _AssignmentDetailScreenState extends State<AssignmentDetailScreen> {
 
     return PortalNavigationShell(
       selectedIndex: 2,
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_rounded),
-            onPressed: () => context.canPop() ? context.pop() : context.go('/assignments'),
-          ),
-          title: Text(
-            'Assignment Overview',
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
-        body: BlocConsumer<SubmissionCubit, SubmissionState>(
-          listener: (context, subState) {
-            if (subState is SubmissionSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Assignment submitted successfully!'),
-                  backgroundColor: AppColors.success,
-                ),
-              );
-              _loadData();
-            } else if (subState is SubmissionFailure) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(subState.message),
-                  backgroundColor: AppColors.error,
-                ),
-              );
-            }
-          },
-          builder: (context, subState) {
-            return BlocBuilder<AssignmentDetailCubit, AssignmentDetailState>(
-              builder: (context, state) {
-                if (state is AssignmentDetailLoading) {
-                  return const Padding(
-                    padding: EdgeInsets.all(AppSpacing.lg),
-                    child: Column(
-                      children: [
-                        PortalSkeleton.card(height: 180),
-                        SizedBox(height: AppSpacing.md),
-                        PortalSkeleton.card(height: 300),
-                      ],
-                    ),
-                  );
-                }
-
-                if (state is AssignmentDetailError) {
-                  return Center(
-                    child: PortalEmptyState(
-                      icon: Icons.error_outline_rounded,
-                      title: 'Assignment Not Found',
-                      description: state.message,
-                      actionLabel: 'Back to Assignments',
-                      onActionPressed: () => context.pop(),
-                    ),
-                  );
-                }
-
-                if (state is AssignmentDetailLoaded) {
-                  return ResponsiveBuilder(
-                    builder: (context, sizingInfo) {
-                      if (sizingInfo.isDesktop) {
-                        return _buildDesktopLayout(context, state, isInstructor, subState);
-                      } else {
-                        return _buildMobileLayout(context, state, isInstructor, subState);
-                      }
-                    },
-                  );
-                }
-
-                return const SizedBox.shrink();
-              },
+      child: BlocConsumer<SubmissionCubit, SubmissionState>(
+        listener: (context, subState) {
+          if (subState is SubmissionSuccess) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Assignment submitted successfully!'),
+                backgroundColor: AppColors.success,
+              ),
             );
-          },
-        ),
+            _loadData();
+          } else if (subState is SubmissionFailure) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(subState.message),
+                backgroundColor: AppColors.error,
+              ),
+            );
+          }
+        },
+        builder: (context, subState) {
+          return BlocBuilder<AssignmentDetailCubit, AssignmentDetailState>(
+            builder: (context, state) {
+              if (state is AssignmentDetailLoading) {
+                return const Padding(
+                  padding: EdgeInsets.all(AppSpacing.lg),
+                  child: Column(
+                    children: [
+                      PortalSkeleton.card(height: 180),
+                      SizedBox(height: AppSpacing.md),
+                      PortalSkeleton.card(height: 300),
+                    ],
+                  ),
+                );
+              }
+
+              if (state is AssignmentDetailError) {
+                return Center(
+                  child: PortalEmptyState(
+                    icon: Icons.error_outline_rounded,
+                    title: 'Assignment Not Found',
+                    description: state.message,
+                    actionLabel: 'Back to Assignments',
+                    onActionPressed: () => context.pop(),
+                  ),
+                );
+              }
+
+              if (state is AssignmentDetailLoaded) {
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
+                        children: [
+                          TextButton.icon(
+                            icon: const Icon(Icons.arrow_back_rounded, size: 16),
+                            label: const Text('Back to Assignments'),
+                            onPressed: () => context.canPop() ? context.pop() : context.go('/assignments'),
+                          ),
+                          const Spacer(),
+                          Text(
+                            'Assignment Overview',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      ResponsiveBuilder(
+                        builder: (context, sizingInfo) {
+                          if (sizingInfo.isDesktop) {
+                            return _buildDesktopLayout(context, state, isInstructor, subState);
+                          } else {
+                            return _buildMobileLayout(context, state, isInstructor, subState);
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              return const SizedBox.shrink();
+            },
+          );
+        },
       ),
     );
   }
@@ -185,36 +193,33 @@ class _AssignmentDetailScreenState extends State<AssignmentDetailScreen> {
     bool isInstructor,
     SubmissionState subState,
   ) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Left Column: Specifications, Attachments, Rubric
-          Expanded(
-            flex: 3,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHeaderCard(context, state.assignment),
-                const SizedBox(height: AppSpacing.md),
-                _buildSpecificationsCard(context, state.assignment),
-                const SizedBox(height: AppSpacing.md),
-                _buildRubricSection(context, state),
-              ],
-            ),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Left Column: Specifications, Attachments, Rubric
+        Expanded(
+          flex: 3,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeaderCard(context, state.assignment),
+              const SizedBox(height: AppSpacing.md),
+              _buildSpecificationsCard(context, state.assignment),
+              const SizedBox(height: AppSpacing.md),
+              _buildRubricSection(context, state),
+            ],
           ),
-          const SizedBox(width: AppSpacing.lg),
+        ),
+        const SizedBox(width: AppSpacing.lg),
 
-          // Right Column: Student Submission / Graded Review OR Instructor Queue
-          Expanded(
-            flex: 2,
-            child: isInstructor
-                ? _buildInstructorSubmissionsQueue(context, state)
-                : _buildStudentSubmissionPanel(context, state, subState),
-          ),
-        ],
-      ),
+        // Right Column: Student Submission / Graded Review OR Instructor Queue
+        Expanded(
+          flex: 2,
+          child: isInstructor
+              ? _buildInstructorSubmissionsQueue(context, state)
+              : _buildStudentSubmissionPanel(context, state, subState),
+        ),
+      ],
     );
   }
 
@@ -224,23 +229,20 @@ class _AssignmentDetailScreenState extends State<AssignmentDetailScreen> {
     bool isInstructor,
     SubmissionState subState,
   ) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeaderCard(context, state.assignment),
-          const SizedBox(height: AppSpacing.md),
-          if (isInstructor)
-            _buildInstructorSubmissionsQueue(context, state)
-          else
-            _buildStudentSubmissionPanel(context, state, subState),
-          const SizedBox(height: AppSpacing.md),
-          _buildSpecificationsCard(context, state.assignment),
-          const SizedBox(height: AppSpacing.md),
-          _buildRubricSection(context, state),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildHeaderCard(context, state.assignment),
+        const SizedBox(height: AppSpacing.md),
+        if (isInstructor)
+          _buildInstructorSubmissionsQueue(context, state)
+        else
+          _buildStudentSubmissionPanel(context, state, subState),
+        const SizedBox(height: AppSpacing.md),
+        _buildSpecificationsCard(context, state.assignment),
+        const SizedBox(height: AppSpacing.md),
+        _buildRubricSection(context, state),
+      ],
     );
   }
 
