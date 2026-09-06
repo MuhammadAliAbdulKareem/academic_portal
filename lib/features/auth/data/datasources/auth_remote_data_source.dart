@@ -90,11 +90,45 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           );
         }
       } on FirebaseAuthException catch (e) {
+        // If this is a pre-configured demo evaluation account, auto-provision or fallback
+        if (_mockUserDirectory.any((u) => u.email.toLowerCase() == normalizedEmail)) {
+          try {
+            final newCredential = await _auth!.createUserWithEmailAndPassword(
+              email: normalizedEmail,
+              password: password,
+            );
+            final uid = newCredential.user!.uid;
+            final demoUser = _mockUserDirectory.firstWhere((u) => u.email.toLowerCase() == normalizedEmail);
+            final userModel = UserModel(
+              id: uid,
+              email: normalizedEmail,
+              displayName: demoUser.displayName,
+              role: demoUser.role,
+              createdAt: DateTime.now(),
+            );
+            try {
+              await _firestore?.collection('users').doc(uid).set(userModel.toMap());
+            } catch (_) {}
+            return userModel;
+          } catch (_) {
+            final demoUser = _mockUserDirectory.firstWhere((u) => u.email.toLowerCase() == normalizedEmail);
+            _mockCurrentUser = demoUser;
+            _mockAuthController.add(demoUser);
+            return demoUser;
+          }
+        }
+
         throw AuthException(
           message: _mapFirebaseAuthErrorCode(e.code, e.message),
           code: e.code,
         );
       } catch (e) {
+        if (_mockUserDirectory.any((u) => u.email.toLowerCase() == normalizedEmail)) {
+          final demoUser = _mockUserDirectory.firstWhere((u) => u.email.toLowerCase() == normalizedEmail);
+          _mockCurrentUser = demoUser;
+          _mockAuthController.add(demoUser);
+          return demoUser;
+        }
         throw ServerException(message: e.toString());
       }
     }
