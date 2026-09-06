@@ -112,6 +112,26 @@ class AppTheme {
         thickness: 1,
         space: 1,
       ),
+      chipTheme: ChipThemeData(
+        backgroundColor: AppColors.lightSurface,
+        disabledColor: AppColors.lightSurfaceAlt,
+        selectedColor: AppColors.primary,
+        secondarySelectedColor: AppColors.primary,
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        labelStyle: textTheme.labelMedium?.copyWith(
+          color: AppColors.lightTextPrimary,
+          fontWeight: FontWeight.w500,
+        ),
+        secondaryLabelStyle: textTheme.labelMedium?.copyWith(
+          color: Colors.white,
+          fontWeight: FontWeight.w600,
+        ),
+        checkmarkColor: Colors.white,
+        side: const BorderSide(color: AppColors.lightBorder),
+        shape: RoundedRectangleBorder(
+          borderRadius: AppSpacing.roundedSm,
+        ),
+      ),
     );
   }
 
@@ -218,6 +238,26 @@ class AppTheme {
         color: AppColors.darkBorder,
         thickness: 1,
         space: 1,
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor: AppColors.darkSurface,
+        disabledColor: AppColors.darkSurfaceAlt,
+        selectedColor: AppColors.primaryLight,
+        secondarySelectedColor: AppColors.primaryLight,
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        labelStyle: textTheme.labelMedium?.copyWith(
+          color: AppColors.darkTextPrimary,
+          fontWeight: FontWeight.w500,
+        ),
+        secondaryLabelStyle: textTheme.labelMedium?.copyWith(
+          color: Colors.white,
+          fontWeight: FontWeight.w600,
+        ),
+        checkmarkColor: Colors.white,
+        side: const BorderSide(color: AppColors.darkBorder),
+        shape: RoundedRectangleBorder(
+          borderRadius: AppSpacing.roundedSm,
+        ),
       ),
     );
   }

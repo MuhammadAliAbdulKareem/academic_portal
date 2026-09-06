@@ -251,10 +251,20 @@ class _DiscussionsScreenState extends State<DiscussionsScreen> {
 
                 // Unresolved toggle
                 FilterChip(
-                  label: const Text('Unresolved Only', style: TextStyle(fontSize: 12)),
+                  label: Text(
+                    'Unresolved Only',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: onlyUnresolved ? FontWeight.w700 : FontWeight.w500,
+                      color: onlyUnresolved
+                          ? Colors.white
+                          : (isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary),
+                    ),
+                  ),
                   selected: onlyUnresolved,
                   onSelected: (_) => context.read<DiscussionsCubit>().toggleUnresolvedOnly(),
-                  selectedColor: AppColors.warning.withAlpha(40),
+                  selectedColor: AppColors.warning,
+                  checkmarkColor: Colors.white,
                   backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
                   shape: RoundedRectangleBorder(
                     borderRadius: AppSpacing.roundedSm,
@@ -280,17 +290,28 @@ class _DiscussionsScreenState extends State<DiscussionsScreen> {
     required DiscussionCategory? category,
     required bool isSelected,
   }) {
+    final activeBg = isDark ? AppColors.primaryLight : AppColors.primary;
     return ChoiceChip(
-      label: Text(label, style: TextStyle(fontSize: 12, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
+      label: Text(
+        label,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+          color: isSelected
+              ? Colors.white
+              : (isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary),
+        ),
+      ),
       selected: isSelected,
       onSelected: (_) => context.read<DiscussionsCubit>().filterByCategory(category),
-      selectedColor: (isDark ? AppColors.primaryLight : AppColors.primary).withAlpha(40),
+      selectedColor: activeBg,
+      checkmarkColor: Colors.white,
       backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
       shape: RoundedRectangleBorder(
         borderRadius: AppSpacing.roundedSm,
         side: BorderSide(
           color: isSelected
-              ? (isDark ? AppColors.primaryLight : AppColors.primary)
+              ? activeBg
               : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
         ),
       ),

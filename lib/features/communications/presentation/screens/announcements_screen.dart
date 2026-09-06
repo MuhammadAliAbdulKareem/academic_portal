@@ -290,19 +290,30 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
     required AnnouncementPriority? priority,
     required bool isSelected,
   }) {
+    final activeBg = isDark ? AppColors.primaryLight : AppColors.primary;
     return ChoiceChip(
-      label: Text(label, style: TextStyle(fontSize: 12, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
+      label: Text(
+        label,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+          color: isSelected
+              ? Colors.white
+              : (isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary),
+        ),
+      ),
       selected: isSelected,
       onSelected: (_) {
         context.read<AnnouncementsCubit>().filterByPriority(priority);
       },
-      selectedColor: (isDark ? AppColors.primaryLight : AppColors.primary).withAlpha(40),
+      selectedColor: activeBg,
+      checkmarkColor: Colors.white,
       backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
       shape: RoundedRectangleBorder(
         borderRadius: AppSpacing.roundedSm,
         side: BorderSide(
           color: isSelected
-              ? (isDark ? AppColors.primaryLight : AppColors.primary)
+              ? activeBg
               : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
         ),
       ),

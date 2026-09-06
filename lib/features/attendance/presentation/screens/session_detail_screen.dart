@@ -336,54 +336,55 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
           scrollDirection: Axis.horizontal,
           child: Row(
             children: [
-              FilterChip(
-                label: const Text('All Roster'),
-                selected: _selectedFilter == null,
-                onSelected: (_) {
-                  setState(() => _selectedFilter = null);
-                  context.read<AttendanceRosterCubit>().filterByStatus(null);
-                },
-              ),
+              _buildStatusFilterChip(label: 'All Roster', status: null, isDark: isDark),
               const SizedBox(width: 8),
-              FilterChip(
-                label: const Text('Present'),
-                selected: _selectedFilter == AttendanceStatus.present,
-                onSelected: (_) {
-                  setState(() => _selectedFilter = AttendanceStatus.present);
-                  context.read<AttendanceRosterCubit>().filterByStatus(AttendanceStatus.present);
-                },
-              ),
+              _buildStatusFilterChip(label: 'Present', status: AttendanceStatus.present, isDark: isDark, activeColor: AppColors.success),
               const SizedBox(width: 8),
-              FilterChip(
-                label: const Text('Late'),
-                selected: _selectedFilter == AttendanceStatus.late,
-                onSelected: (_) {
-                  setState(() => _selectedFilter = AttendanceStatus.late);
-                  context.read<AttendanceRosterCubit>().filterByStatus(AttendanceStatus.late);
-                },
-              ),
+              _buildStatusFilterChip(label: 'Late', status: AttendanceStatus.late, isDark: isDark, activeColor: AppColors.warning),
               const SizedBox(width: 8),
-              FilterChip(
-                label: const Text('Absent'),
-                selected: _selectedFilter == AttendanceStatus.absent,
-                onSelected: (_) {
-                  setState(() => _selectedFilter = AttendanceStatus.absent);
-                  context.read<AttendanceRosterCubit>().filterByStatus(AttendanceStatus.absent);
-                },
-              ),
+              _buildStatusFilterChip(label: 'Absent', status: AttendanceStatus.absent, isDark: isDark, activeColor: AppColors.error),
               const SizedBox(width: 8),
-              FilterChip(
-                label: const Text('Excused'),
-                selected: _selectedFilter == AttendanceStatus.excused,
-                onSelected: (_) {
-                  setState(() => _selectedFilter = AttendanceStatus.excused);
-                  context.read<AttendanceRosterCubit>().filterByStatus(AttendanceStatus.excused);
-                },
-              ),
+              _buildStatusFilterChip(label: 'Excused', status: AttendanceStatus.excused, isDark: isDark, activeColor: AppColors.secondary),
             ],
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildStatusFilterChip({
+    required String label,
+    required AttendanceStatus? status,
+    required bool isDark,
+    Color? activeColor,
+  }) {
+    final isSelected = _selectedFilter == status;
+    final color = activeColor ?? (isDark ? AppColors.primaryLight : AppColors.primary);
+    return FilterChip(
+      label: Text(
+        label,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+          color: isSelected
+              ? Colors.white
+              : (isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary),
+        ),
+      ),
+      selected: isSelected,
+      selectedColor: color,
+      checkmarkColor: Colors.white,
+      backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+        side: BorderSide(
+          color: isSelected ? color : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
+        ),
+      ),
+      onSelected: (_) {
+        setState(() => _selectedFilter = status);
+        context.read<AttendanceRosterCubit>().filterByStatus(status);
+      },
     );
   }
 }
