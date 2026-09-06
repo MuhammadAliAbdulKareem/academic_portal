@@ -13,9 +13,27 @@ import '../cubit/notifications_state.dart';
 class NotificationBadgeButton extends StatelessWidget {
   const NotificationBadgeButton({super.key});
 
+  NotificationsCubit? _findCubit(BuildContext context) {
+    try {
+      return context.read<NotificationsCubit>();
+    } catch (_) {
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final cubit = _findCubit(context);
+    if (cubit == null) {
+      return IconButton(
+        icon: const Icon(Icons.notifications_outlined, size: 22),
+        tooltip: 'Notifications',
+        onPressed: () {},
+      );
+    }
+
     return BlocBuilder<NotificationsCubit, NotificationsState>(
+      bloc: cubit,
       builder: (context, state) {
         final unreadCount = state is NotificationsLoaded ? state.unreadCount : 0;
 
@@ -59,8 +77,13 @@ class NotificationBadgeButton extends StatelessWidget {
   }
 
   void _openNotificationSheet(BuildContext context) {
-    final authState = context.read<AuthCubit>().state;
-    final userId = authState is Authenticated ? authState.user.id : 'demo-student-01';
+    String userId = 'demo-student-01';
+    try {
+      final authState = context.read<AuthCubit>().state;
+      if (authState is Authenticated) {
+        userId = authState.user.id;
+      }
+    } catch (_) {}
 
     showModalBottomSheet(
       context: context,

@@ -355,7 +355,7 @@ class CommunicationsRemoteDataSourceImpl implements CommunicationsRemoteDataSour
       final current = _announcements[index];
       if (!current.readByStudentIds.contains(studentId)) {
         final updatedIds = List<String>.from(current.readByStudentIds)..add(studentId);
-        _announcements[index] = current.copyWith(readByStudentIds: updatedIds) as AnnouncementModel;
+        _announcements[index] = AnnouncementModel.fromEntity(current.copyWith(readByStudentIds: updatedIds));
       }
     }
   }
@@ -427,11 +427,11 @@ class CommunicationsRemoteDataSourceImpl implements CommunicationsRemoteDataSour
 
     final thread = _discussions[index];
     final updatedReplies = List<DiscussionReplyEntity>.from(thread.replies)..add(reply);
-    _discussions[index] = thread.copyWith(
+    _discussions[index] = DiscussionThreadModel.fromEntity(thread.copyWith(
       replies: updatedReplies,
       repliesCount: updatedReplies.length,
       updatedAt: DateTime.now(),
-    ) as DiscussionThreadModel;
+    ));
 
     return reply;
   }
@@ -462,16 +462,16 @@ class CommunicationsRemoteDataSourceImpl implements CommunicationsRemoteDataSour
 
     final updatedReply = reply.copyWith(
       upvotedByUserIds: upvoters,
-      upvotes: upvoters.length,
+      upvotes: alreadyUpvoted ? (reply.upvotes > 0 ? reply.upvotes - 1 : 0) : reply.upvotes + 1,
     );
 
     final updatedReplies = List<DiscussionReplyEntity>.from(thread.replies);
     updatedReplies[replyIndex] = updatedReply;
 
-    _discussions[threadIndex] = thread.copyWith(
+    _discussions[threadIndex] = DiscussionThreadModel.fromEntity(thread.copyWith(
       replies: updatedReplies,
       updatedAt: DateTime.now(),
-    ) as DiscussionThreadModel;
+    ));
   }
 
   @override
@@ -494,11 +494,11 @@ class CommunicationsRemoteDataSourceImpl implements CommunicationsRemoteDataSour
     final updatedReplies = List<DiscussionReplyEntity>.from(thread.replies);
     updatedReplies[replyIndex] = updatedReply;
 
-    _discussions[threadIndex] = thread.copyWith(
+    _discussions[threadIndex] = DiscussionThreadModel.fromEntity(thread.copyWith(
       replies: updatedReplies,
       isResolved: newEndorsement || updatedReplies.any((r) => r.isInstructorEndorsed),
       updatedAt: DateTime.now(),
-    ) as DiscussionThreadModel;
+    ));
   }
 
   @override
@@ -516,7 +516,7 @@ class CommunicationsRemoteDataSourceImpl implements CommunicationsRemoteDataSour
     await Future.delayed(const Duration(milliseconds: 50));
     final index = _notifications.indexWhere((n) => n.id == notificationId);
     if (index != -1) {
-      _notifications[index] = _notifications[index].copyWith(isRead: true) as NotificationModel;
+      _notifications[index] = NotificationModel.fromEntity(_notifications[index].copyWith(isRead: true));
     }
   }
 
@@ -525,7 +525,7 @@ class CommunicationsRemoteDataSourceImpl implements CommunicationsRemoteDataSour
     await Future.delayed(const Duration(milliseconds: 50));
     for (int i = 0; i < _notifications.length; i++) {
       if (_notifications[i].userId == userId || _notifications[i].userId == 'all') {
-        _notifications[i] = _notifications[i].copyWith(isRead: true) as NotificationModel;
+        _notifications[i] = NotificationModel.fromEntity(_notifications[i].copyWith(isRead: true));
       }
     }
   }

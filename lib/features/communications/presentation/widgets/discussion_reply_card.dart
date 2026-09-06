@@ -70,40 +70,43 @@ class DiscussionReplyCard extends StatelessWidget {
                 size: PortalAvatarSize.sm,
               ),
               const SizedBox(width: AppSpacing.sm),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        reply.authorName,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Wrap(
+                      spacing: AppSpacing.xs,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Text(
+                          reply.authorName,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: AppSpacing.xs),
-                      PortalBadge(
-                        label: reply.authorRole.toUpperCase(),
-                        variant: reply.authorRole.toLowerCase().contains('instructor') ||
-                                reply.authorRole.toLowerCase().contains('faculty')
-                            ? PortalBadgeVariant.instructor
-                            : PortalBadgeVariant.student,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    _formatDate(reply.createdAt),
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                        PortalBadge(
+                          label: reply.authorRole.toUpperCase(),
+                          variant: reply.authorRole.toLowerCase().contains('instructor') ||
+                                  reply.authorRole.toLowerCase().contains('faculty')
+                              ? PortalBadgeVariant.instructor
+                              : PortalBadgeVariant.student,
+                        ),
+                      ],
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 2),
+                    Text(
+                      _formatDate(reply.createdAt),
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              const Spacer(),
+              const SizedBox(width: AppSpacing.sm),
               if (isCurrentUserInstructor)
                 PortalButton(
                   label: reply.isInstructorEndorsed ? 'Remove Endorsement' : 'Endorse Solution',
