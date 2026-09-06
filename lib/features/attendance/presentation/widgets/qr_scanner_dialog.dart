@@ -55,7 +55,7 @@ class QrScannerDialog extends StatefulWidget {
 }
 
 class _QrScannerDialogState extends State<QrScannerDialog>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late TabController _tabController;
   late AnimationController _laserController;
   final TextEditingController _pinController = TextEditingController();
@@ -203,20 +203,32 @@ class _QrScannerDialogState extends State<QrScannerDialog>
                       Tab(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(Icons.camera_alt_outlined, size: 16),
-                            SizedBox(width: 8),
-                            Text('Camera Scan'),
+                            SizedBox(width: 6),
+                            Flexible(
+                              child: Text(
+                                'Camera Scan',
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                           ],
                         ),
                       ),
                       Tab(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(Icons.pin_outlined, size: 16),
-                            SizedBox(width: 8),
-                            Text('6-Digit PIN'),
+                            SizedBox(width: 6),
+                            Flexible(
+                              child: Text(
+                                '6-Digit PIN',
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                           ],
                         ),
                       ),

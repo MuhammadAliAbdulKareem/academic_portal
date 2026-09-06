@@ -21,6 +21,7 @@ import 'package:academic_portal/features/attendance/presentation/widgets/attenda
 import 'package:academic_portal/features/attendance/presentation/widgets/attendance_stats_summary_card.dart';
 import 'package:academic_portal/features/attendance/presentation/widgets/portal_qr_widget.dart';
 import 'package:academic_portal/features/attendance/presentation/widgets/session_qr_display_card.dart';
+import 'package:academic_portal/features/attendance/presentation/widgets/qr_scanner_dialog.dart';
 
 class FakeStudentAuthCubit extends Cubit<AuthState> implements AuthCubit {
   FakeStudentAuthCubit()
@@ -431,5 +432,84 @@ void main() {
       expect(find.text('Course Attendance Rates'), findsOneWidget);
       expect(find.text('My Attendance Journal'), findsOneWidget);
     });
+
+    testWidgets('QrScannerDialog renders QR and PIN tabs with TickerProviderStateMixin cleanly',
+        (tester) async {
+      final repo = AttendanceRepositoryImpl(
+        remoteDataSource: AttendanceRemoteDataSourceImpl(),
+      );
+
+      final session = AttendanceSessionModel(
+        id: 's-01',
+        courseId: 'c-01',
+        courseCode: 'CS101',
+        courseTitle: 'Introduction to Computer Science',
+        section: 'Section 1',
+        title: 'Lecture 1: Intro',
+        room: 'Hall A',
+        startTime: DateTime.now(),
+        endTime: DateTime.now().add(const Duration(hours: 1)),
+        qrToken: 'TOKEN-TEST',
+        sessionPin: '654321',
+        isActive: true,
+        expiresAt: DateTime.now().add(const Duration(minutes: 15)),
+        totalEnrolled: 25,
+        presentCount: 10,
+        lateCount: 2,
+        absentCount: 13,
+        excusedCount: 0,
+      );
+
+      await tester.pumpWidget(
+        MultiBlocProvider(
+          providers: [
+            BlocProvider<StudentCheckInCubit>(
+              create: (_) => StudentCheckInCubit(repository: repo),
+            ),
+          ],
+          child: MaterialApp(
+            home: Scaffold(
+              body: Builder(
+                builder: (context) => ElevatedButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (_) => BlocProvider.value(
+                        value: context.read<StudentCheckInCubit>(),
+                        child: QrScannerDialog(
+                          session: session,
+                          studentId: 'st-01',
+                          studentName: 'Alex Rivera',
+                          studentEmail: 'student@edu',
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text('Open QR Dialog'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Open QR Dialog'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      expect(find.text('Class Check-In'), findsOneWidget);
+      expect(find.text('Camera Scan'), findsOneWidget);
+      expect(find.text('6-Digit PIN'), findsOneWidget);
+
+      expect(find.text('Simulate Instant QR Scan'), findsOneWidget);
+
+      // Switch to PIN tab
+      await tester.tap(find.text('6-Digit PIN'));
+      for (int i = 0; i < 10; i++) {
+        await tester.pump(const Duration(milliseconds: 50));
+      }
+      expect(find.textContaining('6-digit session PIN'), findsOneWidget);
+    });
   });
 }
+
