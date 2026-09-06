@@ -275,6 +275,10 @@ class _QuizBuilderScreenState extends State<QuizBuilderScreen> {
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBackground : AppColors.lightBackground,
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: () => context.canPop() ? context.pop() : context.go('/quizzes'),
+        ),
         title: const Text('Create New Assessment'),
         elevation: 0,
         backgroundColor: Colors.transparent,

@@ -6,6 +6,7 @@ import '../../../../core/design_system/components/portal_card.dart';
 import '../../../../core/design_system/components/portal_empty_state.dart';
 import '../../../../core/design_system/components/portal_skeleton.dart';
 import '../../../../core/design_system/components/portal_text_field.dart';
+import '../../../../core/design_system/layout/portal_navigation_shell.dart';
 import '../../../../core/responsive/responsive_layout.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -45,9 +46,12 @@ class _DiscussionsScreenState extends State<DiscussionsScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return ResponsiveLayout(
-      mobile: _buildContent(context, isDark, isMobile: true),
-      desktop: _buildContent(context, isDark, isMobile: false),
+    return PortalNavigationShell(
+      selectedIndex: 6,
+      child: ResponsiveLayout(
+        mobile: _buildContent(context, isDark, isMobile: true),
+        desktop: _buildContent(context, isDark, isMobile: false),
+      ),
     );
   }
 

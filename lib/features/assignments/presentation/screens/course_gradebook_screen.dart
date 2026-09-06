@@ -50,7 +50,7 @@ class _CourseGradebookScreenState extends State<CourseGradebookScreen> {
     final isDark = theme.brightness == Brightness.dark;
 
     return PortalNavigationShell(
-      selectedIndex: 3, // Courses tab
+      selectedIndex: 1, // Courses tab
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
@@ -58,7 +58,7 @@ class _CourseGradebookScreenState extends State<CourseGradebookScreen> {
           elevation: 0,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_rounded),
-            onPressed: () => context.pop(),
+            onPressed: () => context.canPop() ? context.pop() : context.go('/courses'),
           ),
           title: Text(
             'Course Gradebook',

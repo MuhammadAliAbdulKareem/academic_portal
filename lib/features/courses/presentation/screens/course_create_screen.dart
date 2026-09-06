@@ -167,16 +167,7 @@ class _CourseCreateScreenState extends State<CourseCreateScreen> {
     final isDark = theme.brightness == Brightness.dark;
 
     return PortalNavigationShell(
-      selectedIndex: 3,
-      onDestinationSelected: (index) {
-        if (index == 0) {
-          context.go(RouteConstants.root);
-        } else if (index == 1) {
-          context.go(RouteConstants.instructorDashboard);
-        } else if (index == 2) {
-          context.go(RouteConstants.designSystem);
-        }
-      },
+      selectedIndex: 1,
       child: BlocConsumer<CourseFormCubit, CourseFormState>(
         listener: (context, state) {
           if (state is CourseFormSuccess) {

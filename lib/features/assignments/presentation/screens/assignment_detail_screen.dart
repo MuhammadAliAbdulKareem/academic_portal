@@ -94,7 +94,7 @@ class _AssignmentDetailScreenState extends State<AssignmentDetailScreen> {
     final isInstructor = authState is Authenticated && authState.user.role == UserRole.instructor;
 
     return PortalNavigationShell(
-      selectedIndex: 4,
+      selectedIndex: 2,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
@@ -102,7 +102,7 @@ class _AssignmentDetailScreenState extends State<AssignmentDetailScreen> {
           elevation: 0,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_rounded),
-            onPressed: () => context.pop(),
+            onPressed: () => context.canPop() ? context.pop() : context.go('/assignments'),
           ),
           title: Text(
             'Assignment Overview',

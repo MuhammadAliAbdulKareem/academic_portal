@@ -75,7 +75,7 @@ class _AssignmentGradingScreenState extends State<AssignmentGradingScreen> {
         authState is Authenticated ? authState.user.displayName : 'Dr. Robert Vance';
 
     return PortalNavigationShell(
-      selectedIndex: 4,
+      selectedIndex: 2,
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
@@ -83,7 +83,7 @@ class _AssignmentGradingScreenState extends State<AssignmentGradingScreen> {
           elevation: 0,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_rounded),
-            onPressed: () => context.pop(),
+            onPressed: () => context.canPop() ? context.pop() : context.go('/assignments'),
           ),
           title: Text(
             'Instructor Grading Cockpit',

@@ -311,7 +311,7 @@ class _AssignmentListScreenState extends State<AssignmentListScreen>
     final isInstructor = authState is Authenticated && authState.user.role == UserRole.instructor;
 
     return PortalNavigationShell(
-      selectedIndex: 4, // Assignments tab
+      selectedIndex: 2, // Assignments tab
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: RefreshIndicator(

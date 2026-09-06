@@ -128,7 +128,7 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
           appBar: AppBar(
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
-              onPressed: () => context.pop(),
+              onPressed: () => context.canPop() ? context.pop() : context.go('/attendance'),
             ),
             title: const Text('Session Attendance Roster'),
             actions: [

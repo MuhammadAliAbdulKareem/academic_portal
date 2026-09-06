@@ -108,7 +108,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen> {
     final userName = authState is Authenticated ? authState.user.displayName : 'Alex Mercer';
 
     return PortalNavigationShell(
-      selectedIndex: 1,
+      selectedIndex: 0,
       child: RefreshIndicator(
         onRefresh: _handleRefresh,
         child: SingleChildScrollView(

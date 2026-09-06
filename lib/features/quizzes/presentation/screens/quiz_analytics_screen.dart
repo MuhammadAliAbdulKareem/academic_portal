@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/design_system/components/portal_avatar.dart';
 import '../../../../core/design_system/components/portal_badge.dart';
 import '../../../../core/design_system/components/portal_button.dart';
@@ -56,6 +57,10 @@ class _QuizAnalyticsScreenState extends State<QuizAnalyticsScreen> {
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBackground : AppColors.lightBackground,
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: () => context.canPop() ? context.pop() : context.go('/quizzes'),
+        ),
         title: const Text('Assessment Analytics & Roster'),
         elevation: 0,
         backgroundColor: Colors.transparent,

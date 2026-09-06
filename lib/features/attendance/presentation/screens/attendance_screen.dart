@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/responsive/responsive_builder.dart';
+import '../../../../core/design_system/layout/portal_navigation_shell.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../auth/domain/entities/user_entity.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
@@ -214,38 +215,41 @@ class _AttendanceScreenState extends State<AttendanceScreen>
         authState is Authenticated && authState.user.role == UserRole.instructor;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return ResponsiveBuilder(
-      builder: (context, sizingInfo) {
-        final horizontalPadding = sizingInfo.isDesktop ? 32.0 : 16.0;
+    return PortalNavigationShell(
+      selectedIndex: 3,
+      child: ResponsiveBuilder(
+        builder: (context, sizingInfo) {
+          final horizontalPadding = sizingInfo.isDesktop ? 32.0 : 16.0;
 
-        return Scaffold(
-          body: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(
-              horizontal: horizontalPadding,
-              vertical: 24,
-            ),
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 1200),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Header Bar
-                    _buildHeader(context, isInstructor, isDark, sizingInfo),
-                    const SizedBox(height: 24),
+          return Scaffold(
+            body: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(
+                horizontal: horizontalPadding,
+                vertical: 24,
+              ),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 1200),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Header Bar
+                      _buildHeader(context, isInstructor, isDark, sizingInfo),
+                      const SizedBox(height: 24),
 
-                    // Role-Specific Views
-                    if (isInstructor)
-                      _buildInstructorView(context, isDark, sizingInfo)
-                    else
-                      _buildStudentView(context, authState, isDark, sizingInfo),
-                  ],
+                      // Role-Specific Views
+                      if (isInstructor)
+                        _buildInstructorView(context, isDark, sizingInfo)
+                      else
+                        _buildStudentView(context, authState, isDark, sizingInfo),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 

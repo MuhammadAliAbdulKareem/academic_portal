@@ -44,16 +44,7 @@ class _InstructorDashboardScreenState extends State<InstructorDashboardScreen> {
     final isDark = theme.brightness == Brightness.dark;
 
     return PortalNavigationShell(
-      selectedIndex: 1,
-      onDestinationSelected: (index) {
-        if (index == 0) {
-          context.go(RouteConstants.root);
-        } else if (index == 2) {
-          context.go(RouteConstants.designSystem);
-        } else if (index == 3) {
-          context.go(RouteConstants.courses);
-        }
-      },
+      selectedIndex: 0,
       child: BlocBuilder<InstructorDashboardCubit, InstructorDashboardState>(
         builder: (context, state) {
           if (state is InstructorDashboardLoading ||

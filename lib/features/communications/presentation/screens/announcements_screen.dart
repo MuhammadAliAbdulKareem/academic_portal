@@ -5,6 +5,7 @@ import '../../../../core/design_system/components/portal_card.dart';
 import '../../../../core/design_system/components/portal_empty_state.dart';
 import '../../../../core/design_system/components/portal_skeleton.dart';
 import '../../../../core/design_system/components/portal_text_field.dart';
+import '../../../../core/design_system/layout/portal_navigation_shell.dart';
 import '../../../../core/responsive/responsive_layout.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -51,9 +52,12 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
     final isInstructor = authState is Authenticated && authState.user.role.isInstructor;
     final studentId = authState is Authenticated ? authState.user.id : 'demo-student-01';
 
-    return ResponsiveLayout(
-      mobile: _buildContent(context, isDark, isInstructor, studentId, isMobile: true),
-      desktop: _buildContent(context, isDark, isInstructor, studentId, isMobile: false),
+    return PortalNavigationShell(
+      selectedIndex: 5,
+      child: ResponsiveLayout(
+        mobile: _buildContent(context, isDark, isInstructor, studentId, isMobile: true),
+        desktop: _buildContent(context, isDark, isInstructor, studentId, isMobile: false),
+      ),
     );
   }
 

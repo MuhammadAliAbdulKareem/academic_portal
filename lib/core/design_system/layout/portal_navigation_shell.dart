@@ -150,6 +150,22 @@ class _PortalNavigationShellState extends State<PortalNavigationShell> {
     );
   }
 
+  ThemeCubit? _findThemeCubit(BuildContext context) {
+    try {
+      return context.read<ThemeCubit>();
+    } catch (_) {
+      return null;
+    }
+  }
+
+  AuthCubit? _findAuthCubit(BuildContext context) {
+    try {
+      return context.read<AuthCubit>();
+    } catch (_) {
+      return null;
+    }
+  }
+
   PreferredSizeWidget _buildTopHeader(BuildContext context, bool isDark, bool isMobile) {
     return AppBar(
       titleSpacing: AppSpacing.md,
@@ -171,56 +187,81 @@ class _PortalNavigationShellState extends State<PortalNavigationShell> {
         ],
       ),
       actions: [
-        BlocBuilder<ThemeCubit, ThemeState>(
-          builder: (context, themeState) {
-            return IconButton(
-              icon: Icon(
-                themeState.themeMode == ThemeMode.dark
-                    ? Icons.dark_mode_rounded
-                    : Icons.light_mode_rounded,
-                size: 20,
-              ),
-              tooltip: 'Toggle Theme',
-              onPressed: () => context.read<ThemeCubit>().toggleTheme(),
+        Builder(
+          builder: (context) {
+            final themeCubit = _findThemeCubit(context);
+            if (themeCubit == null) {
+              return IconButton(
+                icon: Icon(
+                  isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
+                  size: 20,
+                ),
+                tooltip: 'Toggle Theme',
+                onPressed: () {},
+              );
+            }
+            return BlocBuilder<ThemeCubit, ThemeState>(
+              bloc: themeCubit,
+              builder: (context, themeState) {
+                return IconButton(
+                  icon: Icon(
+                    themeState.themeMode == ThemeMode.dark
+                        ? Icons.dark_mode_rounded
+                        : Icons.light_mode_rounded,
+                    size: 20,
+                  ),
+                  tooltip: 'Toggle Theme',
+                  onPressed: () => themeCubit.toggleTheme(),
+                );
+              },
             );
           },
         ),
         const NotificationBadgeButton(),
         if (widget.trailingHeaderAction != null) widget.trailingHeaderAction!,
         const SizedBox(width: AppSpacing.xs),
-        BlocBuilder<AuthCubit, AuthState>(
-          builder: (context, authState) {
-            if (authState is Authenticated) {
-              final user = authState.user;
-              return Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  PortalBadge(
-                    label: user.role.displayName.toUpperCase(),
-                    variant: user.role.isInstructor
-                        ? PortalBadgeVariant.instructor
-                        : PortalBadgeVariant.student,
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  PortalAvatar(
-                    name: user.displayName,
-                    size: PortalAvatarSize.sm,
-                    isOnline: true,
-                  ),
-                  const SizedBox(width: AppSpacing.xs),
-                  IconButton(
-                    icon: const Icon(Icons.logout_rounded, size: 18),
-                    tooltip: 'Sign Out (${user.displayName})',
-                    onPressed: () => context.read<AuthCubit>().logout(),
-                  ),
-                ],
-              );
+        Builder(
+          builder: (context) {
+            final authCubit = _findAuthCubit(context);
+            if (authCubit == null) {
+              return const SizedBox.shrink();
             }
+            return BlocBuilder<AuthCubit, AuthState>(
+              bloc: authCubit,
+              builder: (context, authState) {
+                if (authState is Authenticated) {
+                  final user = authState.user;
+                  return Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      PortalBadge(
+                        label: user.role.displayName.toUpperCase(),
+                        variant: user.role.isInstructor
+                            ? PortalBadgeVariant.instructor
+                            : PortalBadgeVariant.student,
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      PortalAvatar(
+                        name: user.displayName,
+                        size: PortalAvatarSize.sm,
+                        isOnline: true,
+                      ),
+                      const SizedBox(width: AppSpacing.xs),
+                      IconButton(
+                        icon: const Icon(Icons.logout_rounded, size: 18),
+                        tooltip: 'Sign Out (${user.displayName})',
+                        onPressed: () => authCubit.logout(),
+                      ),
+                    ],
+                  );
+                }
 
-            return TextButton.icon(
-              onPressed: () => context.go(RouteConstants.login),
-              icon: const Icon(Icons.login_rounded, size: 16),
-              label: const Text('Sign In', style: TextStyle(fontWeight: FontWeight.bold)),
+                return TextButton.icon(
+                  onPressed: () => context.go(RouteConstants.login),
+                  icon: const Icon(Icons.login_rounded, size: 16),
+                  label: const Text('Sign In', style: TextStyle(fontWeight: FontWeight.bold)),
+                );
+              },
             );
           },
         ),

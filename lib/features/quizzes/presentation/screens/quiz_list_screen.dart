@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/route_constants.dart';
+import '../../../../core/design_system/layout/portal_navigation_shell.dart';
 import '../../../../core/design_system/components/portal_button.dart';
 import '../../../../core/design_system/components/portal_empty_state.dart';
 import '../../../../core/design_system/components/portal_skeleton.dart';
@@ -74,12 +75,14 @@ class _QuizListScreenState extends State<QuizListScreen> with SingleTickerProvid
     final isInstructor = authState is Authenticated &&
         authState.user.role == UserRole.instructor;
 
-    return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.lightBackground,
-      body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: () => context.read<QuizListCubit>().refresh(),
-          child: CustomScrollView(
+    return PortalNavigationShell(
+      selectedIndex: 4,
+      child: Scaffold(
+        backgroundColor: isDark ? AppColors.darkBackground : AppColors.lightBackground,
+        body: SafeArea(
+          child: RefreshIndicator(
+            onRefresh: () => context.read<QuizListCubit>().refresh(),
+            child: CustomScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
               // Header Sliver
@@ -282,6 +285,7 @@ class _QuizListScreenState extends State<QuizListScreen> with SingleTickerProvid
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }
