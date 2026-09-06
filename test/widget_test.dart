@@ -2,26 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:academic_portal/app/app.dart';
 import 'package:academic_portal/core/bloc/theme_cubit.dart';
-import 'package:academic_portal/core/constants/app_constants.dart';
 import 'package:academic_portal/core/responsive/breakpoint.dart';
 
 void main() {
   group('Project Foundation Tests', () {
-    testWidgets('AcademicPortalApp renders foundation screen successfully',
+    testWidgets('AcademicPortalApp renders portal login gateway successfully',
         (WidgetTester tester) async {
       await tester.pumpWidget(const AcademicPortalApp());
       await tester.pumpAndSettle();
 
-      // Verify app branding is present
-      expect(find.text(AppConstants.appName), findsWidgets);
-      expect(find.text('Academic Portal Platform'), findsOneWidget);
-      expect(find.text(AppConstants.appTagline), findsOneWidget);
-
-      // Verify architectural modules are rendered
-      expect(find.text('Feature-Based Architecture'), findsOneWidget);
-      expect(find.text('Firebase Core & Services'), findsOneWidget);
-      expect(find.text('GoRouter Declarative Navigation'), findsOneWidget);
-      expect(find.text('BLoC State Management'), findsOneWidget);
+      // Verify portal branding and login screen elements are present
+      expect(find.text('Welcome Back'), findsOneWidget);
+      expect(find.text('Sign In to Portal'), findsOneWidget);
+      expect(find.text('Instructor'), findsOneWidget);
+      expect(find.text('Student'), findsOneWidget);
     });
 
     test('Breakpoint categorization handles widths correctly', () {

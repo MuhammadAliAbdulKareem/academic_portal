@@ -63,16 +63,22 @@ class AppRouter {
         final isAuthRoute = state.uri.path == RouteConstants.login ||
             state.uri.path == RouteConstants.register;
 
-        // If authenticated and trying to access login/register, redirect home
+        // If authenticated and trying to access login/register, redirect to dashboard
         if (isAuthenticated && isAuthRoute) {
-          return RouteConstants.root;
+          return RouteConstants.dashboard;
         }
 
-        // If route is protected and user is not authenticated
-        final isProtectedRoute = state.uri.path.startsWith('/dashboard') ||
-            state.uri.path.startsWith('/courses/create');
+        // If root path is accessed, route directly based on auth state
+        if (state.uri.path == RouteConstants.root) {
+          return isAuthenticated ? RouteConstants.dashboard : RouteConstants.login;
+        }
 
-        if (!isAuthenticated && isProtectedRoute) {
+        // Protected routes: require authentication
+        final isPublicRoute = isAuthRoute ||
+            state.uri.path == RouteConstants.foundation ||
+            state.uri.path == RouteConstants.designSystem;
+
+        if (!isAuthenticated && !isPublicRoute) {
           return RouteConstants.login;
         }
 
@@ -82,7 +88,16 @@ class AppRouter {
         GoRoute(
           path: RouteConstants.root,
           name: 'home',
-          builder: (context, state) => const FoundationScreen(),
+          builder: (context, state) {
+            final authState = authCubit.state;
+            if (authState is Authenticated) {
+              if (authState.user.role.isStudent) {
+                return const StudentDashboardScreen();
+              }
+              return const InstructorDashboardScreen();
+            }
+            return const LoginScreen();
+          },
         ),
         GoRoute(
           path: RouteConstants.foundation,

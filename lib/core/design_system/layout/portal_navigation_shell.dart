@@ -49,22 +49,10 @@ class PortalNavigationShell extends StatefulWidget {
 
   static const List<PortalNavItem> defaultNavItems = [
     PortalNavItem(
-      label: 'Home',
-      icon: Icons.home_outlined,
-      selectedIcon: Icons.home_rounded,
-      route: '/',
-    ),
-    PortalNavItem(
       label: 'Dashboard',
       icon: Icons.dashboard_outlined,
       selectedIcon: Icons.dashboard_rounded,
       route: '/dashboard',
-    ),
-    PortalNavItem(
-      label: 'Design System',
-      icon: Icons.palette_outlined,
-      selectedIcon: Icons.palette_rounded,
-      route: '/design-system',
     ),
     PortalNavItem(
       label: 'Courses',
