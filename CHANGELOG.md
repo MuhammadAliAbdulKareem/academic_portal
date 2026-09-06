@@ -4,6 +4,43 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.0.0] - 2026-09-06 — Milestone Release: Campus Communications, Course Discussions & Unified Notification Center
+
+### Added
+- Domain Layer:
+  - `AnnouncementPriority` (`urgent`, `high`, `normal`, `low`) and `AnnouncementEntity` with priority badges, pinned status, read acknowledgments, and course-level/campus-wide scoping.
+  - `DiscussionCategory` (`general`, `lecture`, `homework`, `examPrep`, `projects`), `DiscussionReplyEntity`, and `DiscussionThreadEntity` supporting multi-level Q&A, markdown-rendered code snippets, community upvoting, and verified instructor endorsements.
+  - `NotificationType` (`announcement`, `discussionReply`, `assignmentDue`, `gradePosted`, `system`) and `NotificationEntity` with unread states, deep-link target routes, and timestamps.
+  - `CommunicationsRepository` contract covering announcement broadcasts, course-scoped announcements, acknowledgment receipts, discussion threads, reply postings, upvote toggling, faculty endorsement flags, notification streams, and batch mark-as-read operations.
+- Data Layer:
+  - `AnnouncementModel`, `DiscussionThreadModel`, `DiscussionReplyModel`, and `NotificationModel` with complete JSON & Firestore serialization/deserialization.
+  - `CommunicationsRemoteDataSource` and `CommunicationsRemoteDataSourceImpl` pre-seeded with campus-wide emergency bulletins, CS101, CS201, and MATH301 discussions with formatted code blocks, community upvote trackers, verified instructor endorsements, and interactive notification histories.
+  - `CommunicationsRepositoryImpl` bridging domain entities with remote data sources and unified `ServerException` error handling.
+- State Management:
+  - `AnnouncementsCubit` & `AnnouncementsState` for real-time announcement browsing, course filters, priority tabs (All, Urgent, Normal, Low), search queries, and instant read receipts.
+  - `DiscussionsCubit` & `DiscussionsState` with course filters, category pills, search queries, unresolved thread toggles, and new question creation.
+  - `DiscussionDetailCubit` & `DiscussionDetailState` managing thread conversations, question cards, reply postings with optional code snippets, community upvoting, and instructor solution endorsements.
+  - `NotificationsCubit` & `NotificationsState` tracking live unread counts, unread notification sheets, individual mark-as-read, batch mark-all-read, and target route navigation.
+- Presentation Components & Screens:
+  - `AnnouncementCard`: Priority-themed notification banner with pinned badge, author badge, priority chips, and acknowledgment check action.
+  - `DiscussionThreadCard`: Engaging forum card with category pill, verified answer badge, author metadata, replies count, and relative timestamps.
+  - `DiscussionReplyCard`: Rich discussion reply with faculty endorsement banner, markdown code container, upvote counter button, and instructor endorsement toggle.
+  - `NotificationBadgeButton`: Real-time AppBar bell icon with dynamic unread badge and bottom sheet notification center supporting direct route navigation.
+  - `CreateAnnouncementDialog` & `CreateDiscussionDialog`: Interactive creation modals for campus broadcasts and course Q&A questions.
+  - `AnnouncementsScreen`: Unified announcement bulletin with priority filtering, search bar, and faculty broadcast launcher.
+  - `DiscussionsScreen`: Course Q&A forum with filter tabs, unresolved toggle, search bar, and question composer dialog.
+  - `DiscussionDetailScreen`: Thread-level conversation view with original question, verified solution highlights, community replies, and bottom reply composer.
+- Routing & Navigation Integration:
+  - Registered routes: `/announcements`, `/discussions`, and `/discussions/:id`.
+  - Integrated Announcements and Discussions in primary navigation sidebar and mobile drawer in `PortalNavigationShell`.
+  - Integrated interactive `NotificationBadgeButton` with unread badge in top portal navigation bar across all responsive screen sizes.
+  - Registered `CommunicationsRepository` and all 4 communications cubits in `AcademicPortalApp` root provider tree.
+- Quality Assurance & Release:
+  - 16 comprehensive unit, cubit, and widget tests in `test/communications_test.dart`.
+  - 86/86 tests passing (100%) across the entire academic portal project test suite.
+  - 0 static analysis warnings or errors on `flutter analyze`.
+  - Successful production web compilation verified with `flutter build web --release`.
+
 ## [v0.9.0] - 2026-09-06 — Quizzes, Interactive Exams & Assessment Engine
 
 ### Added
