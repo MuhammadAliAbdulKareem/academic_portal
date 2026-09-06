@@ -178,8 +178,10 @@ class _CourseListScreenState extends State<CourseListScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               titleColumn,
-              const SizedBox(height: AppSpacing.md),
-              createButton,
+              if (isInstructor) ...[
+                const SizedBox(height: AppSpacing.md),
+                createButton,
+              ],
             ],
           );
         }
@@ -188,8 +190,10 @@ class _CourseListScreenState extends State<CourseListScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(child: titleColumn),
-            const SizedBox(width: AppSpacing.md),
-            createButton,
+            if (isInstructor) ...[
+              const SizedBox(width: AppSpacing.md),
+              createButton,
+            ],
           ],
         );
       },
