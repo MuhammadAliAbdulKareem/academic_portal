@@ -22,12 +22,15 @@ class FirebaseConfig {
       if (kIsWeb ||
           defaultTargetPlatform == TargetPlatform.android ||
           defaultTargetPlatform == TargetPlatform.iOS ||
-          defaultTargetPlatform == TargetPlatform.macOS) {
+          defaultTargetPlatform == TargetPlatform.windows) {
         await Firebase.initializeApp(
           options: DefaultFirebaseOptions.currentPlatform,
         );
         _isInitialized = true;
-        developer.log('Firebase initialized successfully.', name: 'FirebaseConfig');
+        developer.log(
+          'Firebase initialized successfully for project: ${DefaultFirebaseOptions.currentPlatform.projectId}',
+          name: 'FirebaseConfig',
+        );
       } else {
         developer.log(
           'Firebase initialized in fallback mode for platform $defaultTargetPlatform.',

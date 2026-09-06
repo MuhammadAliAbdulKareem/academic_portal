@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "638037754928",
+    "project_id": "academic-portal-48b66",
+    "storage_bucket": "academic-portal-48b66.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:638037754928:android:8b7f344d0b0bc7ef7d99f5",
+        "android_client_info": {
+          "package_name": "com.academicportal.academic_portal"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-qsq8q1PA0apH7uv2MnWnjh4qy9HIMRY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
